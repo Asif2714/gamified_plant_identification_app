@@ -1,0 +1,15 @@
+# This file contains software developed by PlantNet (https://github.com/plantnet/PlantNet-300K).
+# BSD 2-Clause License from PlantNet applies.
+
+name: plantnet_300k_env
+channels:
+  - pytorch
+
+dependencies:
+  - tqdm
+  - pytorch
+  - torchvision
+  - pip:
+      - timm
+
+

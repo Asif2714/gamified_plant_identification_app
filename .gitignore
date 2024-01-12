@@ -1,2 +1,6 @@
 # Ignoring the folder with all training dataset pictures
 model_training/images/
+
+model_training/heroku_deployment_test/weights/
+model_training/oldresults/
+model_training/heroku_deployment_test/
