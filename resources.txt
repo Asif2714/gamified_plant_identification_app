@@ -1,0 +1,9 @@
+# using pytorch inside django app
+https://stefanbschneider.github.io/blog/posts/pytorch-django/index.html
+
+# using image picker for react native to send POST request
+https://dev.to/natedegoey/react-native-making-a-post-request-with-an-image-from-image-picker-20dl
+
+
+https://www.npmjs.com/package/react-native-fetch-blob -> outdated
+https://github.com/RonRadtke/react-native-blob-util: maintained and forked

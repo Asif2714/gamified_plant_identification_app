@@ -4,3 +4,7 @@ model_training/images/
 model_training/heroku_deployment_test/weights/
 model_training/oldresults/
 model_training/heroku_deployment_test/
+
+
+# Ignoring specific tar files
+backend\identify_app\xp1_weights_best_acc.tar

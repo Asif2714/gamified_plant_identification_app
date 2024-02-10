@@ -1,5 +1,5 @@
-# This file contains software developed by PlantNet (https://github.com/plantnet/PlantNet-300K).
-# BSD 2-Clause License from PlantNet applies.
+# This file contains software developed by or derived from the PlantNet project (https://github.com/plantnet/PlantNet-300K).
+# Licensed under the BSD 2-Clause License from PlantNet. See LICENSE file in the model_training folder for more details.
 
 name: plantnet_300k_env
 channels:

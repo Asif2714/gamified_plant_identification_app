@@ -1,4 +1,3 @@
-
 import time;
 
 # get the start time before imports
@@ -95,52 +94,4 @@ total_time = et - startTimeBeforeImport
 print('Execution time with imports:', total_time, 'seconds')
 
 
-# Use the predicted 7-digit string to get the class name
-# predicted_class_name = ordered_species_json.get(predicted_class_str, 'Unknown Class')
-# print(f'Predicted class: {predicted_class_name}')
 
-# # Make predictions
-# with torch.no_grad():
-#     outputs = model(image)
-#     probabilities = torch.softmax(outputs, dim=1)
-
-# # Interpret the results
-# class_probabilities, predicted_class = torch.max(probabilities, 1)
-# predicted_class = predicted_class.item()  
-# print(predicted_class)
-# confidence = class_probabilities.item()
-# print(f'Confidence: {confidence}')
-# predicted_class_str = str(predicted_class)  
-# # print(predicted_class_str)
-# predicted_class_name = class_names.get(predicted_class_str, 'Unknown Class')
-# print(f'Predicted class: {predicted_class_name}')
-
-
-
-
-
-
-
-# # Preprocess the input image
-# image_path = './test_images/pelarogonium_echinatum.jpg'  
-# preprocess = transforms.Compose([
-#     transforms.Resize((224, 224)),  # Match the crop size you used during training
-#     transforms.ToTensor(),
-#     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),  # Match your training data normalization
-# ])
-# image = Image.open(image_path)
-# image = preprocess(image)
-# image = image.unsqueeze(0)  # Add batch dimension (1 image)
-
-# # Make predictions
-# with torch.no_grad():
-#     outputs = model(image)
-#     probabilities = torch.softmax(outputs, dim=1)  # Convert to class probabilities
-
-# # Interpret the results (e.g., find the class with the highest probability)
-# class_probabilities, predicted_class = torch.max(probabilities, 1)
-# print(f'Predicted class: {predicted_class.item()}')
-
-# # You may also map the class index to the actual plant species name based on your dataset
-# class_names = ['Class 0', 'Class 1', 'something', ...]  
-# print(f'Predicted class: {class_names[predicted_class.item()]}')
