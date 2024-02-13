@@ -58,7 +58,6 @@ def upload_image(request):
 model_path = os.path.join(os.path.dirname(__file__), 'xp1_weights_best_acc.tar')
 
 loaded_model = torch.load(model_path, map_location=torch.device('cpu'))
-# print(checkpoint.keys()) # for debugging. Output: dict_keys(['epoch', 'model', 'optimizer'])
 
 model = models.resnet18(pretrained=False)
 num_ftrs = model.fc.in_features
@@ -82,7 +81,7 @@ def test_get_request(request):
 @csrf_exempt
 def predict_image(request):
     print("predicting image")
-    print("Full request data body:", request.body)
+    # print("Full request data body:", request.body)
     if request.method == 'POST':
         print("in post")
         image_file = request.FILES.get('file')
