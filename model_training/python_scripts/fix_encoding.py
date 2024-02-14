@@ -4,7 +4,7 @@ def fix_encoding(text):
    fixed_text = text.encode('latin1', 'ignore').decode('utf-8', 'ignore')
    return fixed_text
 
-with open('ordered_id_species.json', 'r', encoding='utf-8') as file:
+with open('../ordered_id_species.json', 'r', encoding='utf-8') as file:
     data = json.load(file)
 
 for item in data.values():

@@ -105,8 +105,9 @@ def predict_image(request):
                     predicted_class_string = str(predicted_class.item())
                     if predicted_class_string in ordered_species_json:
                         classification = ordered_species_json[predicted_class_string]['plant_name']
+                        common_name = ordered_species_json[predicted_class_string]['common_name']
                         print("Successful")
-                        return JsonResponse({'Predicted Class': classification, 'Confidence': confidence.item()})
+                        return JsonResponse({'scientific_name': classification, 'common_name': common_name, 'confidence': confidence.item()})
                     else:
                         print("")
                         return JsonResponse({'error': 'Predicted class not in JSON'})

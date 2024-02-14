@@ -10,7 +10,7 @@ import requests
 import json
 
 # Get API KEY from https://trefle.io/
-api_key = 'lJVAmXG0XTWhqmSFmxqHAqvgfMdU2XVp6ZRMv_22XRE'
+api_key = 'YOUR_API_KEY'
 
 def get_common_name(scientific_name):
     name_parts = scientific_name.split()
@@ -55,7 +55,7 @@ def get_common_name(scientific_name):
 
 # ================================
 # Read the file without common name
-with open('D:/Files/QMUL Docs/_Final Year/Final Year Project/fyp_code/model_training/ordered_id_species_wo_common_name.json', 'r') as file:
+with open('../ordered_id_species_wo_common_name.json', 'r') as file:
     data = json.load(file)
 
 # Iterate through each plant species 
