@@ -6,12 +6,12 @@
     },
     "1": {
         "plant_id": "1355920",
-        "plant_name": "Pelargonium capitatum (L.) L'H\u00c3\u00a9r.",
+        "plant_name": "Pelargonium capitatum (L.) L'Hér.",
         "common_name": "Rose scented geranium"
     },
     "2": {
         "plant_id": "1355932",
-        "plant_name": "Pelargonium graveolens L'H\u00c3\u00a9r.",
+        "plant_name": "Pelargonium graveolens L'Hér.",
         "common_name": "Sweet scented geranium"
     },
     "3": {
@@ -26,22 +26,22 @@
     },
     "5": {
         "plant_id": "1355955",
-        "plant_name": "Pelargonium odoratissimum (L.) L'H\u00c3\u00a9r.",
+        "plant_name": "Pelargonium odoratissimum (L.) L'Hér.",
         "common_name": "Apple geranium"
     },
     "6": {
         "plant_id": "1355959",
-        "plant_name": "Pelargonium peltatum (L.) L'H\u00c3\u00a9r.",
+        "plant_name": "Pelargonium peltatum (L.) L'Hér.",
         "common_name": "Ivyleaf geranium"
     },
     "7": {
         "plant_id": "1355961",
-        "plant_name": "Pelargonium quercifolium (L. f.) L'H\u00c3\u00a9r.",
+        "plant_name": "Pelargonium quercifolium (L. f.) L'Hér.",
         "common_name": "Oakleaf geranium"
     },
     "8": {
         "plant_id": "1355978",
-        "plant_name": "Pelargonium zonale (L.) L'H\u00c3\u00a9r.",
+        "plant_name": "Pelargonium zonale (L.) L'Hér.",
         "common_name": "Horseshoe geranium"
     },
     "9": {
@@ -767,7 +767,7 @@
     "153": {
         "plant_id": "1360998",
         "plant_name": "Anthericum liliago L.",
-        "common_name": "St. bernard\u2019s lily"
+        "common_name": "St. bernards lily"
     },
     "154": {
         "plant_id": "1361024",
@@ -1336,7 +1336,7 @@
     },
     "267": {
         "plant_id": "1367938",
-        "plant_name": "Acacia drepanolobium Harms ex Y. Sj\u00c3\u00b6stedt",
+        "plant_name": "Acacia drepanolobium Harms ex Y. Sjöstedt",
         "common_name": "Acacia-hedge"
     },
     "268": {
@@ -1401,7 +1401,7 @@
     },
     "280": {
         "plant_id": "1373151",
-        "plant_name": "Pelargonium alchemilloides (L.) L'H\u00c3\u00a9r.",
+        "plant_name": "Pelargonium alchemilloides (L.) L'Hér.",
         "common_name": "Night-scent pelargonium"
     },
     "281": {
@@ -1561,7 +1561,7 @@
     },
     "312": {
         "plant_id": "1384482",
-        "plant_name": "Cucurbita ficifolia Bouch\u00c3\u00a9",
+        "plant_name": "Cucurbita ficifolia Bouché",
         "common_name": "Figleaf gourd"
     },
     "313": {
@@ -1691,7 +1691,7 @@
     },
     "338": {
         "plant_id": "1389308",
-        "plant_name": "Sedum dendroideum Moc. & Sess\u00c3\u00a9 ex DC.",
+        "plant_name": "Sedum dendroideum Moc. & Sessé ex DC.",
         "common_name": "Tree stonecrop"
     },
     "339": {
@@ -2321,7 +2321,7 @@
     },
     "464": {
         "plant_id": "1394153",
-        "plant_name": "Ophrys morisii (Martelli) So\u00c3\u00b3",
+        "plant_name": "Ophrys morisii (Martelli) Soó",
         "common_name": "Bertoloni's ophrys"
     },
     "465": {
@@ -2331,7 +2331,7 @@
     },
     "466": {
         "plant_id": "1394169",
-        "plant_name": "Ophrys provincialis (Baumann & K\u00c3\u00bcnkele) Paulus",
+        "plant_name": "Ophrys provincialis (Baumann & Künkele) Paulus",
         "common_name": "Bertoloni's ophrys"
     },
     "467": {
@@ -3226,7 +3226,7 @@
     },
     "645": {
         "plant_id": "1405685",
-        "plant_name": "Acalypha wilkesiana M\u00c3\u00bcll.Arg.",
+        "plant_name": "Acalypha wilkesiana Müll.Arg.",
         "common_name": "Capa de obispo"
     },
     "646": {
@@ -3266,7 +3266,7 @@
     },
     "653": {
         "plant_id": "1407379",
-        "plant_name": "Anthurium crystallinum Linden & Andr\u00c3\u00a9",
+        "plant_name": "Anthurium crystallinum Linden & André",
         "common_name": "Flamingo-lily"
     },
     "654": {
@@ -3381,7 +3381,7 @@
     },
     "676": {
         "plant_id": "1408508",
-        "plant_name": "Phyllanthus niruroides M\u00c3\u00bcll.Arg.",
+        "plant_name": "Phyllanthus niruroides Müll.Arg.",
         "common_name": "Carry me seed"
     },
     "677": {
@@ -3511,7 +3511,7 @@
     },
     "702": {
         "plant_id": "1409238",
-        "plant_name": "Anthurium andraeanum Linden ex Andr\u00c3\u00a9",
+        "plant_name": "Anthurium andraeanum Linden ex André",
         "common_name": "Flamingo-lily"
     },
     "703": {
@@ -3567,7 +3567,7 @@
     "713": {
         "plant_id": "1409550",
         "plant_name": "Dendrobium chrysotoxum Lindl.",
-        "common_name": "\uabc8\uabe3\uabc9\uabe8\uabc3\uabe6\uabc2\uabe9"
+        "common_name": ""
     },
     "714": {
         "plant_id": "1409551",
@@ -4141,7 +4141,7 @@
     },
     "828": {
         "plant_id": "1419077",
-        "plant_name": "Lycoris radiata (L'H\u00c3\u00a9r.) Herb.",
+        "plant_name": "Lycoris radiata (L'Hér.) Herb.",
         "common_name": "Red spider lily"
     },
     "829": {
@@ -4156,7 +4156,7 @@
     },
     "831": {
         "plant_id": "1419112",
-        "plant_name": "Pelargonium crispum (P.J. Bergius) L'H\u00c3\u00a9r.",
+        "plant_name": "Pelargonium crispum (P.J. Bergius) L'Hér.",
         "common_name": "Crisped-leaf pelargonium"
     },
     "832": {
@@ -4596,7 +4596,7 @@
     },
     "919": {
         "plant_id": "1435714",
-        "plant_name": "Pelargonium zonale (L.) L'H\u00c3\u00a9r. ex Aiton",
+        "plant_name": "Pelargonium zonale (L.) L'Hér. ex Aiton",
         "common_name": "Horseshoe geranium"
     },
     "920": {
@@ -4851,7 +4851,7 @@
     },
     "970": {
         "plant_id": "1464567",
-        "plant_name": "Anthurium faustomirandae P\u00c3\u00a9rez-Farr. & Croat",
+        "plant_name": "Anthurium faustomirandae Pérez-Farr. & Croat",
         "common_name": "Flamingo-lily"
     },
     "971": {
@@ -4881,7 +4881,7 @@
     },
     "976": {
         "plant_id": "1486475",
-        "plant_name": "Cereus forbesii C.F.F\u00c3\u00b6rst.",
+        "plant_name": "Cereus forbesii C.F.Först.",
         "common_name": "Desert night-blooming cereus"
     },
     "977": {
@@ -4936,7 +4936,7 @@
     },
     "987": {
         "plant_id": "1497630",
-        "plant_name": "Tradescantia \u00c3\u2014 andersoniana W.Ludw. & Rohweder",
+        "plant_name": "Tradescantia  andersoniana W.Ludw. & Rohweder",
         "common_name": "TODO: did not found"
     },
     "988": {
@@ -5036,7 +5036,7 @@
     },
     "1007": {
         "plant_id": "1529205",
-        "plant_name": "Sedum hernandezii J. Meyr\u00c3\u00a1n",
+        "plant_name": "Sedum hernandezii J. Meyrán",
         "common_name": "White stonecrop"
     },
     "1008": {
@@ -5086,7 +5086,7 @@
     },
     "1017": {
         "plant_id": "1550692",
-        "plant_name": "Pelargonium \u00c3\u2014 hortorum L.H. Bailey",
+        "plant_name": "Pelargonium  hortorum L.H. Bailey",
         "common_name": "Horseshoe geranium"
     },
     "1018": {
@@ -5166,7 +5166,7 @@
     },
     "1033": {
         "plant_id": "1608003",
-        "plant_name": "Nepenthes \u00c3\u2014 neglecta Macfarl.",
+        "plant_name": "Nepenthes  neglecta Macfarl.",
         "common_name": "TODO: did not found"
     },
     "1034": {
@@ -5306,7 +5306,7 @@
     },
     "1061": {
         "plant_id": "1667445",
-        "plant_name": "Fragaria \u00c3\u2014 ananassa (Duchesne ex Weston) Duchesne ex Rozier",
+        "plant_name": "Fragaria  ananassa (Duchesne ex Weston) Duchesne ex Rozier",
         "common_name": "Garden strawberry"
     },
     "1062": {
