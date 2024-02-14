@@ -7,3 +7,7 @@ https://dev.to/natedegoey/react-native-making-a-post-request-with-an-image-from-
 
 https://www.npmjs.com/package/react-native-fetch-blob -> outdated
 https://github.com/RonRadtke/react-native-blob-util: maintained and forked
+
+
+Tutorials:
+https://www.youtube.com/watch?v=4fT2kmTWGwE&list=PLgjw1dR712joAlRdIc6BMNhX6_hrsL7kE&index=3 -> React native Bottom Tabs
