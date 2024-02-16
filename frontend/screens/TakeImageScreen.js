@@ -17,7 +17,7 @@ const options = {
 }
 }
 
-const ipAddress = '192.168.1.213';
+const ipAddress = '192.168.1.214';
 
 export default function TakeImageScreen() {
 
