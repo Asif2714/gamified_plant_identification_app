@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
 // import XPBar from "./components/XPBar";
@@ -22,7 +21,6 @@ export default function MainAppScreen() {
       {/* <View style={styles.xpBarContainer}>
         <XPBar currentXP={70} maxXP={100} />
       </View> */}
-      <NavigationContainer>
         <Tab.Navigator
           screenOptions={({ route }) => ({
             tabBarActiveTintColor: "green",
@@ -64,7 +62,6 @@ export default function MainAppScreen() {
           <Tab.Screen name="Leaderboard" component={LeaderboardGamesScreen} />
           <Tab.Screen name="Profile" component={ProfileScreen} />
         </Tab.Navigator>
-      </NavigationContainer>
     </>
   );
 };

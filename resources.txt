@@ -12,8 +12,7 @@ https://github.com/RonRadtke/react-native-blob-util: maintained and forked
 
 Resources
 https://jdenticon.com/#icon-
-
-
+https://reactnavigation.org/docs/stack-navigator/
 
 Tutorials:
 https://www.youtube.com/watch?v=4fT2kmTWGwE&list=PLgjw1dR712joAlRdIc6BMNhX6_hrsL7kE&index=3 -> React native Bottom Tabs
