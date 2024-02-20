@@ -1,9 +1,16 @@
 # Django imports
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 import json
 import os
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.core.files.base import ContentFile
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 # PyTorch related imports
 import torch
@@ -12,12 +19,66 @@ import torchvision.models as models
 import torchvision.transforms as transforms
 from PIL import Image
 import imghdr
-
 import base64
 from io import BytesIO
 
 
 
+
+# Setting up pydenticon
+import pydenticon
+import hashlib
+padding = (20, 20, 20, 20)
+foreground = [ "rgb(45,79,255)",
+               "rgb(254,180,44)",
+               "rgb(226,121,234)",
+               "rgb(30,179,253)",
+               "rgb(232,77,65)",
+               "rgb(49,203,115)",
+               "rgb(141,69,170)" ]
+background = "rgb(224,224,224)"
+generator = pydenticon.Generator(5, 5, digest=hashlib.sha1,
+                                 foreground=foreground, background=background)
+
+# View functions for Profile system
+@csrf_exempt
+def register(request):
+    """Handles the user registration
+
+    Args:
+        request (HttpRequest): The HTTP request.
+
+
+    Returns:
+        HttpResponse: The rendered response from server
+    """
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+        except json.JSONDecodeError as e:
+            return JsonResponse({'error': str(e)}, status=400)
+        
+        email = data.get('email')
+        username = data.get('username')
+        password = data.get('password')
+
+        if User.objects.filter(username=username).exists():
+            print("User already exists!")
+            return JsonResponse({'error': 'User already exists'}, status=400)
+
+        # if User.objects.filter(email=email).exists(): # can add this check if required
+        hashed_password = make_password(password)
+        user = User.objects.create(username=username, email=email, password=hashed_password)
+        identicon = generator.generate(username, 200, 200,
+                               padding=padding, inverted=True, output_format="png")
+        identicon_file = ContentFile(identicon, name=f"{user.username}_identicon.png")
+
+        user.profile_picture.save(identicon_file.name, identicon_file, save=True)
+        return JsonResponse({'success': 'User created'}, status=201)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+# View functions for predictions
 
 @csrf_exempt  # TODO: exempt for simplicity, disabling CSRF. For production, we need to include tokens
 def upload_image(request):

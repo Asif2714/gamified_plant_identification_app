@@ -7,3 +7,6 @@ model_training/heroku_deployment_test/
 
 
 # Ignoring specific tar files
+
+#ignoring identicons - might be included later | stored in Amazon S3
+backend/media/profile_pictures/
