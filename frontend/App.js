@@ -38,6 +38,10 @@ const App = () => {
     setUserToken(token);
   };
 
+  const handleSignOut = () => {
+    setUserToken(null); 
+  };
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
@@ -46,7 +50,7 @@ const App = () => {
         {/* {userToken ? <MainAppScreen /> : <AuthScreens />} */}
 
         {userToken ? (
-          <MainAppScreen />
+          <MainAppScreen onSignOut={handleSignOut} />
         ) : (
           <AuthTab.Navigator>
             <AuthTab.Screen 

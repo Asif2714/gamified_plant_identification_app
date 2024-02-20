@@ -15,7 +15,7 @@ import ProfileScreen from "./ProfileScreen";
 const Tab = createBottomTabNavigator();
 
 // Screen when the user is logged in. Showing all other Screens within tabs
-export default function MainAppScreen() {
+export default function MainAppScreen({onSignOut}) {
   return (
     <>
       {/* <View style={styles.xpBarContainer}>
@@ -60,7 +60,8 @@ export default function MainAppScreen() {
           <Tab.Screen name="Challenges" component={ChallengesScreen} />
           <Tab.Screen name="Identify" component={TakeImageScreen} />
           <Tab.Screen name="Leaderboard" component={LeaderboardGamesScreen} />
-          <Tab.Screen name="Profile" component={ProfileScreen} />
+          <Tab.Screen name="Profile" children={() => <ProfileScreen onSignOut={onSignOut} />}
+       />
         </Tab.Navigator>
     </>
   );
