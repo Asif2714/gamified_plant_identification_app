@@ -1,4 +1,5 @@
 # Django imports
+
 import json
 import os
 from django.shortcuts import render
@@ -11,6 +12,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.contrib import auth
 from rest_framework.authtoken.models import Token
+from django.core.files.storage import default_storage
+from .models import Plant
+from datetime import datetime
+import logging
+logger = logging.getLogger(__name__)
 
 User = auth.get_user_model()
 
@@ -23,6 +29,8 @@ from PIL import Image
 import imghdr
 import base64
 from io import BytesIO
+from django.utils import timezone
+
 
 
 
@@ -154,7 +162,58 @@ def get_user_details(request):
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
+# View functions for relevant plant details
+
+@csrf_exempt
+def save_plant_details(request):
+    print("attempting to save plant details")
+    if request.method == 'POST':
+        print("in POST of plant details")
+        try:
+            print(request)
+            user = User.objects.get(username=request.POST.get('username'))
+            print("got username!")
+            scientific_name = request.POST.get('scientific_name')
+            common_name = request.POST.get('common_name')
+            gps_coordinates = request.POST.get('gps_coordinates')
+            image_file = request.FILES.get('file')
+
+            filename = f"{user}_{scientific_name}.{image_file.name.split('.')[-1]}"
+
+            # Create and save the Plant instance
+            plant = Plant.objects.create(
+                user=user,
+                scientific_name=scientific_name,
+                common_name=common_name,
+                gps_coordinates=gps_coordinates,
+                image=image_file,
+                date_time_taken=timezone.now()
+            )
+
+            plant.image.save(filename, image_file, save=True)
+
+            # Return a success response
+            return JsonResponse({'success': 'Plant details saved successfully.'}, status=200)
+
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except KeyError as e:
+            return JsonResponse({'error': f'Missing field: {str(e)}'}, status=400)
+        except Exception as e:
+            # Log the error to the server's error log for more detailed debugging.
+            logger.error(f'Error saving plant details: {str(e)}', exc_info=True)
+            return JsonResponse({'error': str(e)}, status=500)
+
+    else:
+        # Only allow POST requests
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+
+
+
 # View functions for predictions
+
 
 @csrf_exempt  # TODO: exempt for simplicity, disabling CSRF. For production, we need to include tokens
 def upload_image(request):

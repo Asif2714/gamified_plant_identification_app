@@ -5,6 +5,8 @@ import axios from "axios";
 
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import { Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Location from 'expo-location';
 
 const options = {
   title: "Select Image",
@@ -19,7 +21,7 @@ const options = {
 const ipAddress = "10.0.2.2";
 
 export default function TakeImageScreen() {
-  const [image, setImage] = useState(null);
+  const [imageIdentified, setImage] = useState(null);
   const [imageDetails, setImageDetails] = useState(null);
 
   const pickImageAndSend = async () => {
@@ -30,50 +32,106 @@ export default function TakeImageScreen() {
       quality: 1,
     });
 
-    const formdata = new FormData();
+    if (!result.canceled) {
+      setImage(result.assets[0]);  // Save image for later use
 
-    //TODO: remove logging
-    const image = result.assets[0];
-    console.log("This is image" + image);
+      const formdata = new FormData();
 
-    formdata.append("file", {
-      uri: image.uri,
-      type: image.mimeType || "image/jpeg",
-      name: image.fileName || "uploaded_image.jpg",
-    });
-
-    try {
-      let response = await fetch(`http://${ipAddress}:8000/predict/`, {
-        method: "post",
-        body: formdata,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      const image = result.assets[0];
+      
+      formdata.append("file", {
+        uri: image.uri,
+        type: image.mimeType || "image/jpeg",
+        name: image.fileName || "uploaded_image.jpg",
       });
 
-      let responseJson = await response.json();
-      console.log(responseJson, "responseJson");
+      try {
+        let response = await fetch(`http://${ipAddress}:8000/predict/`, {
+          method: "POST",
+          body: formdata,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
 
-      const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence}`;
+        let responseJson = await response.json();
+        console.log(responseJson, "responseJson");
+        setImageDetails(responseJson); // Save the details for later use
 
-      const showSaveConfirmation = (responseJson) => {
-        Alert.alert("Save Picture", "Do you want to save this picture?", [
-          { text: "No" },
-          { text: "Yes", onPress: () => saveImageDetails(responseJson) },
+        const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence}`;
+
+        
+        Alert.alert('Identification Results', formattedResponse, [
+          { text: 'OK', onPress: () => showSaveConfirmation(image) }
         ]);
-      };
 
-      // using callback to have one to another transition from Identication
-      // to confirmation.
-      Alert.alert("Identification Results", formattedResponse, [
-        { text: "OK", onPress: () => showSaveConfirmation(responseJson) },
-      ]);
+      } catch (error) {
+        console.error(error);
+        Alert.alert(
+          "Server Connection Error",
+          "Could not connect to the server."
+        );
+      }
+    }
+  };
+
+  const showSaveConfirmation = (image) => {
+    Alert.alert(
+      'Save Picture',
+      'Do you want to save this picture?',
+      [
+        { text: 'No' },
+        { text: 'Yes', onPress: () => saveImageDetails(image) }
+      ]
+    );
+  };
+
+
+  // Saving the image to django backend
+  const saveImageDetails = async (selectedImage) => {
+    const username = await AsyncStorage.getItem('username');
+
+    // Get GPS location
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'Need access to location to store image');
+      return;
+    }
+
+    const location = await Location.getCurrentPositionAsync({});
+    const gpsCoordinates = `${location.coords.latitude},${location.coords.longitude}`;
+
+    //TODO: create a view function to check if the plant picture is already saved
+
+    const formData = new FormData();
+    formData.append('file', {
+      uri: selectedImage.uri,  // from pickImageAndSend
+      type: 'image/jpeg',
+      name: 'plant.jpg'
+    });
+    formData.append('scientific_name', imageDetails.scientific_name);
+    formData.append('common_name', imageDetails.common_name);
+    formData.append('gps_coordinates', gpsCoordinates);
+    formData.append('username', username);
+
+    try {
+      const response = await fetch(`http://${ipAddress}:8000/save-plant-details/`, {
+        method: 'POST',
+        headers: {
+          // 'Authorization': `Token ${userToken}`,
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        Alert.alert('Success', 'The plant has been saved successfully.');
+      } else {
+        Alert.alert('Error', 'Could not save the plant details.');
+      }
     } catch (error) {
-      console.error(error);
-      Alert.alert(
-        "Server Connection Error",
-        "Could not connect to the server."
-      );
+      console.error('Error saving plant details:', error);
+      Alert.alert('Error', 'An error occurred while saving plant details.');
     }
   };
 
@@ -90,6 +148,10 @@ export default function TakeImageScreen() {
       );
     }
   };
+
+
+
+
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
