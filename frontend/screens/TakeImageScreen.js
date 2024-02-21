@@ -1,105 +1,98 @@
+import React, { useState } from "react";
+import { View, Button, Image, Alert, StyleSheet, Text } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
 
-import React, { useState } from 'react';
-import { View, Button, Image, Alert, StyleSheet,Text } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import axios from 'axios';
-
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { Platform } from 'react-native';
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import { Platform } from "react-native";
 
 const options = {
-  title: 'Select Image',
-  type: 'library',
+  title: "Select Image",
+  type: "library",
   options: {
     selectionLimit: 1,
-    mediaType: 'photo',
+    mediaType: "photo",
     includeBase64: false,
-}
-}
+  },
+};
 
-const ipAddress = '10.0.2.2';
+const ipAddress = "10.0.2.2";
 
 export default function TakeImageScreen() {
-
   const [image, setImage] = useState(null);
+  const [imageDetails, setImageDetails] = useState(null);
 
   const pickImageAndSend = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 3],
-          quality: 1,
-        });
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
 
-        const formdata = new FormData()
+    const formdata = new FormData();
 
-        //TODO: remove logging
-        const image = result.assets[0];
-        console.log("This is image" + image);
+    //TODO: remove logging
+    const image = result.assets[0];
+    console.log("This is image" + image);
 
-        formdata.append('file', {
-          uri: image.uri,
-          type: image.mimeType || 'image/jpeg',
-          name: image.fileName || 'uploaded_image.jpg'
-        })
-        
+    formdata.append("file", {
+      uri: image.uri,
+      type: image.mimeType || "image/jpeg",
+      name: image.fileName || "uploaded_image.jpg",
+    });
 
-        try {
-          let response = await fetch(
-            `http://${ipAddress}:8000/predict/`,
-            {
-              method: 'post',
-              body: formdata,
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              }
-            }
-          );
+    try {
+      let response = await fetch(`http://${ipAddress}:8000/predict/`, {
+        method: "post",
+        body: formdata,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-        let responseJson = await response.json();
-        console.log(responseJson, "responseJson")
+      let responseJson = await response.json();
+      console.log(responseJson, "responseJson");
 
-        const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence}`;
+      const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence}`;
 
-        const showSaveConfirmation = (responseJson) => {
-          Alert.alert(
-            'Save Picture',
-            'Do you want to save this picture?',
-            [
-              { text: 'No' },
-              { text: 'Yes', onPress: () => saveImageDetails(responseJson) }
-            ]
-          );
-        };
-
-        // using callback to have one to another transition from Identication 
-        // to confirmation.
-        Alert.alert('Identification Results', formattedResponse, [
-          { text: 'OK', onPress: () => showSaveConfirmation(responseJson) }
+      const showSaveConfirmation = (responseJson) => {
+        Alert.alert("Save Picture", "Do you want to save this picture?", [
+          { text: "No" },
+          { text: "Yes", onPress: () => saveImageDetails(responseJson) },
         ]);
-
-        
-  
-        } catch (error) {
-              console.error(error);
-              Alert.alert('Server Connection Error', 'Could not connect to the server.');
-        }
       };
 
-      const testServerConnection = async () => {
-            try {
-              const response = await fetch(`http://${ipAddress}:8000/test-get/`);
-              const json = await response.json();
-              Alert.alert('Server Response', JSON.stringify(json));
-            } catch (error) {
-              console.error(error);
-              Alert.alert('Server Connection Error', 'Could not connect to the server.');
-            }
-          };
+      // using callback to have one to another transition from Identication
+      // to confirmation.
+      Alert.alert("Identification Results", formattedResponse, [
+        { text: "OK", onPress: () => showSaveConfirmation(responseJson) },
+      ]);
+    } catch (error) {
+      console.error(error);
+      Alert.alert(
+        "Server Connection Error",
+        "Could not connect to the server."
+      );
+    }
+  };
+
+  const testServerConnection = async () => {
+    try {
+      const response = await fetch(`http://${ipAddress}:8000/test-get/`);
+      const json = await response.json();
+      Alert.alert("Server Response", JSON.stringify(json));
+    } catch (error) {
+      console.error(error);
+      Alert.alert(
+        "Server Connection Error",
+        "Could not connect to the server."
+      );
+    }
+  };
 
   return (
-    <View
-    style={{flex:1, alignItems:'center', justifyContent:'center'}}>
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       {/* <Button title='upload' onPress={openGallery}></Button> */}
       <Button title="Pick an Image from Gallery" onPress={pickImageAndSend} />
       <Button title="Test Server Connection" onPress={testServerConnection} />
@@ -115,5 +108,3 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-
-
