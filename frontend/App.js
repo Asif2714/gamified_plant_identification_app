@@ -11,16 +11,10 @@ import MainAppScreen from "./screens/MainAppScreen";
 import RegistrationScreen from "./screens/RegistrationScreen";
 import SignInScreen from "./screens/SignInScreen";
 
-const AuthTab = createBottomTabNavigator();
+// Context API
+import { UserProvider } from "./contexts/UserContext";
 
-// const AuthScreens = () => {
-//   return (
-//     <AuthTab.Navigator>
-//         <AuthTab.Screen name="SignIn" component={SignInScreen} />
-//         <AuthTab.Screen name="Register" component={RegistrationScreen} />
-//     </AuthTab.Navigator>
-//   );
-// };
+const AuthTab = createBottomTabNavigator();
 
 const App = () => {
   const [userToken, setUserToken] = useState(null);
@@ -42,53 +36,59 @@ const App = () => {
   };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
-        {/* TODO: implement sign out! */}
-        {/* {userToken ? <MainAppScreen /> : <AuthScreens />} */}
+    <UserProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <NavigationContainer>
+          {/* TODO: implement sign out! */}
+          {/* {userToken ? <MainAppScreen /> : <AuthScreens />} */}
 
-        {userToken ? (
-          <MainAppScreen onSignOut={handleSignOut} />
-        ) : (
-          <AuthTab.Navigator
-            screenOptions={({ route }) => ({
-              tabBarActiveTintColor: "green",
-              tabBarInactiveTintColor: "gray",
-              tabBarStyle: {
-                backgroundColor: "black",
-              },
-              tabBarLabelStyle: {
-                fontWeight: "bold",
-              },
-              tabBarIcon: ({ focused, color, size }) => {
-                let iconName;
-                let iconSize = size;
-                let iconColor = color;
-                if (route.name === "SignIn") {
-                  iconName = focused ? "log-in" : "log-in-outline";
-                } else if (route.name === "Register") {
-                  iconName = focused ? "person-add" : "person-add-outline";
-                } 
-                return (
-                  <Ionicons name={iconName} size={iconSize} color={iconColor} />
-                );
-              },
-            })}
-          >
-            <AuthTab.Screen
-              name="SignIn"
-              children={() => <SignInScreen onSignIn={setUserToken} />}
-            />
-            <AuthTab.Screen
-              name="Register"
-              children={() => (
-                <RegistrationScreen onRegistrationComplete={setUserToken} />
-              )}
-            />
-          </AuthTab.Navigator>
-        )}
-      </NavigationContainer>
-    </GestureHandlerRootView>
+          {userToken ? (
+            <MainAppScreen onSignOut={handleSignOut} />
+          ) : (
+            <AuthTab.Navigator
+              screenOptions={({ route }) => ({
+                tabBarActiveTintColor: "green",
+                tabBarInactiveTintColor: "gray",
+                tabBarStyle: {
+                  backgroundColor: "black",
+                },
+                tabBarLabelStyle: {
+                  fontWeight: "bold",
+                },
+                tabBarIcon: ({ focused, color, size }) => {
+                  let iconName;
+                  let iconSize = size;
+                  let iconColor = color;
+                  if (route.name === "SignIn") {
+                    iconName = focused ? "log-in" : "log-in-outline";
+                  } else if (route.name === "Register") {
+                    iconName = focused ? "person-add" : "person-add-outline";
+                  }
+                  return (
+                    <Ionicons
+                      name={iconName}
+                      size={iconSize}
+                      color={iconColor}
+                    />
+                  );
+                },
+              })}
+            >
+              <AuthTab.Screen
+                name="SignIn"
+                children={() => <SignInScreen onSignIn={setUserToken} />}
+              />
+              <AuthTab.Screen
+                name="Register"
+                children={() => (
+                  <RegistrationScreen onRegistrationComplete={setUserToken} />
+                )}
+              />
+            </AuthTab.Navigator>
+          )}
+        </NavigationContainer>
+      </GestureHandlerRootView>
+    </UserProvider>
   );
 };
 

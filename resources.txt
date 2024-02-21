@@ -7,16 +7,25 @@ https://dev.to/natedegoey/react-native-making-a-post-request-with-an-image-from-
 
 https://www.npmjs.com/package/react-native-fetch-blob -> outdated
 https://github.com/RonRadtke/react-native-blob-util: maintained and forked
-
+https://stackoverflow.com/questions/14567586/token-authentication-for-restful-api-should-the-token-be-periodically-changed -> Toekn Authentication
 
 
 Resources
 https://jdenticon.com/#icon-
-https://reactnavigation.org/docs/stack-navigator/
 https://docs.djangoproject.com/en/5.0/topics/auth/customizing/#referencing-the-user-model -> using get_user_model for user
 https://pydenticon.readthedocs.io/en/0.3/usage.html -> pyidenticon instructions
 
 
+
+Django and React/React native
+https://reactnavigation.org/docs/stack-navigator/
+https://reactnative.dev/docs/asyncstorage -> persistent key value storage
+https://www.freecodecamp.org/news/context-api-in-react/
+https://legacy.reactjs.org/docs/context.html -> Context api
+
 Tutorials:
 https://www.youtube.com/watch?v=4fT2kmTWGwE&list=PLgjw1dR712joAlRdIc6BMNhX6_hrsL7kE&index=3 -> React native Bottom Tabs
 https://youtu.be/-1tUW-Vvkxk?t=305 -> passing functions as props in React Native
+
+Issues:
+https://stackoverflow.com/questions/8381193/handle-json-decode-error-when-nothing-returned -> JsonDecodeErrors

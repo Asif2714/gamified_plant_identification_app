@@ -9,8 +9,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth import get_user_model
-User = get_user_model()
+from django.contrib import auth
+from rest_framework.authtoken.models import Token
+
+User = auth.get_user_model()
 
 # PyTorch related imports
 import torch
@@ -50,7 +52,7 @@ def register(request):
 
 
     Returns:
-        HttpResponse: The rendered response from server
+        JsonResponse: The  response from server indicating status of registering
     """
 
     if request.method == 'POST':
@@ -59,9 +61,9 @@ def register(request):
         except json.JSONDecodeError as e:
             return JsonResponse({'error': str(e)}, status=400)
         
-        email = data.get('email')
-        username = data.get('username')
-        password = data.get('password')
+        email: str = data.get('email')
+        username: str = data.get('username')
+        password: str = data.get('password')
 
         if User.objects.filter(username=username).exists():
             print("User already exists!")
@@ -78,6 +80,68 @@ def register(request):
         return JsonResponse({'success': 'User created'}, status=201)
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@csrf_exempt
+def login(request):
+    """Handle user's login
+
+    Args:
+        request (HttpRequest): The HTTP request to log in user
+
+    Returns:
+        TODO:
+    """
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+        except json.JSONDecodeError as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+        username: str = data.get('username')
+        password: str = data.get('password')
+        user = auth.authenticate(username=username, password=password)
+
+        if user is not None:
+            token, _ = Token.objects.get_or_create(user=user)
+            print({'token': token.key, 'username': user.username})
+            return JsonResponse({'token': token.key, 'username': user.username})
+        else:
+            return JsonResponse({'error': 'Invalid user name or password'}, status=400)
+
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+# @csrf_exempt
+# def logout TODO
+    
+
+@csrf_exempt
+def get_user_details(request):
+    if request.method == 'GET':
+        #TODO: in prod, include request.user.is_authenticated: or something similar
+        username = request.GET.get('username') 
+        if username:
+            try:
+                user = User.objects.get(username=username)  
+                user_data = {
+                    'username': user.username,
+                    'email': user.email,
+                    'profile_name': getattr(user, 'profile_name', 'Profile Name is not set'),
+                    'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                    'experience_points': getattr(user, 'experience_points', 0),
+                }
+                return JsonResponse(user_data)
+            except User.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+           
+        else:
+            return JsonResponse({'error': 'ID not provided'}, status=401)
+
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
 # View functions for predictions
 
 @csrf_exempt  # TODO: exempt for simplicity, disabling CSRF. For production, we need to include tokens
