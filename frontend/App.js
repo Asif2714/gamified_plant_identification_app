@@ -5,6 +5,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 // import XPBar from "./components/XPBar";
 import { View, Text, StyleSheet, Button } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Screens
 import MainAppScreen from "./screens/MainAppScreen";
@@ -23,16 +24,9 @@ const App = () => {
     //TODO: logic to check if user is already signed in and setting userToeken accordingly
   }, []);
 
-  const handleRegistrationComplete = (token) => {
-    setUserToken(token);
-  };
-
-  const handleSignIn = (token) => {
-    setUserToken(token);
-  };
 
   const handleSignOut = () => {
-    setUserToken(null);
+    setUserToken(null); 
   };
 
   return (
@@ -43,7 +37,7 @@ const App = () => {
           {/* {userToken ? <MainAppScreen /> : <AuthScreens />} */}
 
           {userToken ? (
-            <MainAppScreen onSignOut={handleSignOut} />
+            <MainAppScreen onSignOut={handleSignOut}/>
           ) : (
             <AuthTab.Navigator
               screenOptions={({ route }) => ({

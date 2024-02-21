@@ -113,9 +113,21 @@ def login(request):
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-# @csrf_exempt
-# def logout TODO
+@csrf_exempt
+def logout(request):
+    if request.method == 'POST':
+        auth.logout(request)
     
+        # TODO: not sure if this will still work as I have changed thigns. need to check
+        if hasattr(request.user, 'auth_token'):
+                request.user.auth_token.delete()
+
+        return JsonResponse({'success': 'Logged out successfully'}, status=200)
+
+
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
 
 @csrf_exempt
 def get_user_details(request):
