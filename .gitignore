@@ -6,7 +6,10 @@ model_training/oldresults/
 model_training/heroku_deployment_test/
 
 
-# Ignoring specific tar files
+# Ignoring specific files folders
+backend/backend/__pycache__/
+
+
 
 #ignoring identicons - might be included later | stored in Amazon S3
 backend/media/profile_pictures/
