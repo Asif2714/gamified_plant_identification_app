@@ -1,76 +1,95 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
 // import XPBar from "./components/XPBar";
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Button } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Importing the screens for navigation
-import TakeImageScreen from "./screens/TakeImageScreen";
-import HomeScreen from "./screens/HomeScreen.js";
-import ChallengesScreen from "./screens/ChallengesScreen";
-import LeaderboardGamesScreen from "./screens/LeaderboardGamesScreen";
-import ProfileScreen from "./screens/ProfileScreen";
+// Screens
+import MainAppScreen from "./screens/MainAppScreen";
+import RegistrationScreen from "./screens/RegistrationScreen";
+import SignInScreen from "./screens/SignInScreen";
 
-const Tab = createBottomTabNavigator();
+// Context API
+import { UserProvider } from "./contexts/UserContext";
+
+const AuthTab = createBottomTabNavigator();
 
 const App = () => {
-  return (
-    <>
-      {/* <View style={styles.xpBarContainer}>
-        <XPBar currentXP={70} maxXP={100} />
-      </View> */}
-      <NavigationContainer>
-        <Tab.Navigator
-          screenOptions={({ route }) => ({
-            tabBarActiveTintColor: "green",
-            tabBarInactiveTintColor: "gray",
-            tabBarStyle: {
-              backgroundColor: "black",
-            },
-            tabBarLabelStyle: {
-              fontWeight: "bold",
-              // fontSize: 12
-            },
-            tabBarIcon: ({ focused, color, size }) => {
-              let iconName;
-              let iconSize = size;
-              let iconColor = color;
-              if (route.name === "Home") {
-                iconName = focused ? "home" : "home-outline";
-              } else if (route.name === "Challenges") {
-                iconName = focused ? "ribbon" : "ribbon-outline";
-              } else if (route.name === "Identify") {
-                iconName = focused ? "leaf" : "leaf-outline";
-                iconSize = focused ? size * 1.5 : size;
-                iconColor = focused ? "limegreen" : "darkgreen";
-              } else if (route.name === "Leaderboard") {
-                iconName = focused ? "podium" : "podium-outline";
-              } else if (route.name === "Profile") {
-                iconName = focused ? "person" : "person-outline";
-              }
+  const [userToken, setUserToken] = useState(null);
 
-              return (
-                <Ionicons name={iconName} size={iconSize} color={iconColor} />
-              );
-            },
-          })}
-        >
-          <Tab.Screen name="Home" component={HomeScreen} />
-          <Tab.Screen name="Challenges" component={ChallengesScreen} />
-          <Tab.Screen name="Identify" component={TakeImageScreen} />
-          <Tab.Screen name="Leaderboard" component={LeaderboardGamesScreen} />
-          <Tab.Screen name="Profile" component={ProfileScreen} />
-        </Tab.Navigator>
-      </NavigationContainer>
-    </>
+  useEffect(() => {
+    //TODO: logic to check if user is already signed in and setting userToeken accordingly
+  }, []);
+
+
+  const handleSignOut = () => {
+    setUserToken(null); 
+  };
+
+  return (
+    <UserProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <NavigationContainer>
+          {/* TODO: implement sign out! */}
+          {/* {userToken ? <MainAppScreen /> : <AuthScreens />} */}
+
+          {userToken ? (
+            <MainAppScreen onSignOut={handleSignOut}/>
+          ) : (
+            <AuthTab.Navigator
+              screenOptions={({ route }) => ({
+                tabBarActiveTintColor: "green",
+                tabBarInactiveTintColor: "gray",
+                tabBarStyle: {
+                  backgroundColor: "black",
+                },
+                tabBarLabelStyle: {
+                  fontWeight: "bold",
+                },
+                tabBarIcon: ({ focused, color, size }) => {
+                  let iconName;
+                  let iconSize = size;
+                  let iconColor = color;
+                  if (route.name === "SignIn") {
+                    iconName = focused ? "log-in" : "log-in-outline";
+                  } else if (route.name === "Register") {
+                    iconName = focused ? "person-add" : "person-add-outline";
+                  }
+                  return (
+                    <Ionicons
+                      name={iconName}
+                      size={iconSize}
+                      color={iconColor}
+                    />
+                  );
+                },
+              })}
+            >
+              <AuthTab.Screen
+                name="SignIn"
+                children={() => <SignInScreen onSignIn={setUserToken} />}
+              />
+              <AuthTab.Screen
+                name="Register"
+                children={() => (
+                  <RegistrationScreen onRegistrationComplete={setUserToken} />
+                )}
+              />
+            </AuthTab.Navigator>
+          )}
+        </NavigationContainer>
+      </GestureHandlerRootView>
+    </UserProvider>
   );
 };
 
 // const styles = StyleSheet.create({
 //     xpBarContainer: {
-//       height: 20, 
-//       backgroundColor: '#000', 
+//       height: 20,
+//       backgroundColor: '#000',
 //     },
 
 // });

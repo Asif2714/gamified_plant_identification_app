@@ -1,9 +1,18 @@
 # Django imports
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 import json
 import os
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.core.files.base import ContentFile
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.hashers import make_password
+from django.contrib import auth
+from rest_framework.authtoken.models import Token
+
+User = auth.get_user_model()
 
 # PyTorch related imports
 import torch
@@ -12,12 +21,140 @@ import torchvision.models as models
 import torchvision.transforms as transforms
 from PIL import Image
 import imghdr
-
 import base64
 from io import BytesIO
 
 
 
+
+# Setting up pydenticon
+import pydenticon
+import hashlib
+padding = (20, 20, 20, 20)
+foreground = [ "rgb(45,79,255)",
+               "rgb(254,180,44)",
+               "rgb(226,121,234)",
+               "rgb(30,179,253)",
+               "rgb(232,77,65)",
+               "rgb(49,203,115)",
+               "rgb(141,69,170)" ]
+background = "rgb(224,224,224)"
+generator = pydenticon.Generator(5, 5, digest=hashlib.sha1,
+                                 foreground=foreground, background=background)
+
+# View functions for Profile system
+@csrf_exempt
+def register(request):
+    """Handles the user registration
+
+    Args:
+        request (HttpRequest): The HTTP request.
+
+
+    Returns:
+        JsonResponse: The  response from server indicating status of registering
+    """
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+        except json.JSONDecodeError as e:
+            return JsonResponse({'error': str(e)}, status=400)
+        
+        email: str = data.get('email')
+        username: str = data.get('username')
+        password: str = data.get('password')
+
+        if User.objects.filter(username=username).exists():
+            print("User already exists!")
+            return JsonResponse({'error': 'User already exists'}, status=400)
+
+        # if User.objects.filter(email=email).exists(): # can add this check if required
+        hashed_password = make_password(password)
+        user = User.objects.create(username=username, email=email, password=hashed_password)
+        identicon = generator.generate(username, 200, 200,
+                               padding=padding, inverted=True, output_format="png")
+        identicon_file = ContentFile(identicon, name=f"{user.username}_identicon.png")
+
+        user.profile_picture.save(identicon_file.name, identicon_file, save=True)
+        return JsonResponse({'success': 'User created'}, status=201)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@csrf_exempt
+def login(request):
+    """Handle user's login
+
+    Args:
+        request (HttpRequest): The HTTP request to log in user
+
+    Returns:
+        TODO:
+    """
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+        except json.JSONDecodeError as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+        username: str = data.get('username')
+        password: str = data.get('password')
+        user = auth.authenticate(username=username, password=password)
+
+        if user is not None:
+            token, _ = Token.objects.get_or_create(user=user)
+            print({'token': token.key, 'username': user.username})
+            return JsonResponse({'token': token.key, 'username': user.username})
+        else:
+            return JsonResponse({'error': 'Invalid user name or password'}, status=400)
+
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+@csrf_exempt
+def logout(request):
+    if request.method == 'POST':
+        auth.logout(request)
+    
+        # TODO: not sure if this will still work as I have changed thigns. need to check
+        if hasattr(request.user, 'auth_token'):
+                request.user.auth_token.delete()
+
+        return JsonResponse({'success': 'Logged out successfully'}, status=200)
+
+
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+@csrf_exempt
+def get_user_details(request):
+    if request.method == 'GET':
+        #TODO: in prod, include request.user.is_authenticated: or something similar
+        username = request.GET.get('username') 
+        if username:
+            try:
+                user = User.objects.get(username=username)  
+                user_data = {
+                    'username': user.username,
+                    'email': user.email,
+                    'profile_name': getattr(user, 'profile_name', 'Profile Name is not set'),
+                    'profile_picture': user.profile_picture.url if user.profile_picture else None,
+                    'experience_points': getattr(user, 'experience_points', 0),
+                }
+                return JsonResponse(user_data)
+            except User.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+           
+        else:
+            return JsonResponse({'error': 'ID not provided'}, status=401)
+
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+# View functions for predictions
 
 @csrf_exempt  # TODO: exempt for simplicity, disabling CSRF. For production, we need to include tokens
 def upload_image(request):

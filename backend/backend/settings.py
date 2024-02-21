@@ -28,6 +28,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:8000',
+#     'http://127.0.0.1:8000'
+# ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 
@@ -40,10 +46,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'identify_app',
     'corsheaders',
+    'rest_framework.authtoken',
     # 'identify_app.apps.ImageClassificationConfig',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -51,7 +59,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -136,6 +143,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 #     "http://localhost:8081",
 # ]
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.1.213','10.47.89.55', '10.47.5.125', '192.168.1.213', ]
+ALLOWED_HOSTS = ['10.0.2.2','127.0.0.1', 'localhost']
 
 AUTH_USER_MODEL = 'identify_app.User'
+
+DEFAULT_AUTHENTICATION_CLASSES = [
+    'rest_framework.authentication.TokenAuthentication',
+]
