@@ -58,7 +58,27 @@ export default function TakeImageScreen() {
 
         let responseJson = await response.json();
         console.log(responseJson, "responseJson")
-        Alert.alert('Server Response', JSON.stringify(responseJson));
+
+        const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence}`;
+
+        const showSaveConfirmation = (responseJson) => {
+          Alert.alert(
+            'Save Picture',
+            'Do you want to save this picture?',
+            [
+              { text: 'No' },
+              { text: 'Yes', onPress: () => saveImageDetails(responseJson) }
+            ]
+          );
+        };
+
+        // using callback to have one to another transition from Identication 
+        // to confirmation.
+        Alert.alert('Identification Results', formattedResponse, [
+          { text: 'OK', onPress: () => showSaveConfirmation(responseJson) }
+        ]);
+
+        
   
         } catch (error) {
               console.error(error);
