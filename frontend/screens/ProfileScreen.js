@@ -1,13 +1,17 @@
-import React, { useState, useEffect, useContext } from "react";
-import { View, Text, StyleSheet, Button, Image } from "react-native";
+import React, { useState, useEffect, useContext, useCallback  } from "react";
+import { View, Text, StyleSheet, Button, Image, FlatList } from "react-native";
 import { UserContext } from "../contexts/UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from '@react-navigation/native';
 
 const ipAddress = "10.0.2.2";
 
 export default function ProfileScreen(props) {
   const { user, setUser, setUserToken, setUserId } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Storing list and details of plants for user
+  const [plantNames, setPlantNames] = useState([]);
 
   const fetchUserDetails = async () => {
     const username = await AsyncStorage.getItem("username");
@@ -36,6 +40,7 @@ export default function ProfileScreen(props) {
     }
   };
 
+  // loading data when component mounts in App
   useEffect(() => {
     fetchUserDetails();
   }, []);
@@ -73,6 +78,50 @@ export default function ProfileScreen(props) {
     props.onSignOut();
   };
 
+  const fetchUserPlants = async () => {
+    const username = await AsyncStorage.getItem("username");
+
+    try {
+      const response = await fetch(
+        `http://${ipAddress}:8000/get-user-plants/${username}/`
+      );
+      const json = await response.json();
+
+      if (response.ok) {
+        setPlantNames(json.plants); // You should have a state variable 'plantNames' defined to hold this data
+      } else {
+        console.error("Failed to fetch plant names");
+      }
+    } catch (error) {
+      console.error("Error fetching plant names:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchUserPlants();
+    }
+  }, [user]);
+
+  const renderPlantName = ({ item }) => {
+    return <Text style={styles.plantName}>{item}</Text>;
+  };
+
+
+  // fetch userplants everytime the page is loaded
+  useFocusEffect(
+    useCallback(() => {
+      const fetchPlants = async () => {
+        const username = await AsyncStorage.getItem('username');
+        if (username) {
+          fetchUserPlants();
+        }
+      };
+  
+      fetchPlants();
+    }, [])
+  );
+
   if (isLoading) {
     return <Text>Loading...</Text>;
   }
@@ -92,7 +141,7 @@ export default function ProfileScreen(props) {
       <Text style={styles.text}>Email: {user.email}</Text>
       <Text style={styles.text}>Profile Name: {user.profile_name}</Text>
       <Image
-      //TODO: shift to amazon s3, or update this url later to not have emulator ip.
+        //TODO: shift to amazon s3, or update this url later to not have emulator ip.
         source={{ uri: `http://10.0.2.2:8000${user.profile_picture}` }}
         style={styles.image}
         onError={(e) => console.log(e.nativeEvent.error)} // Log image load errors
@@ -100,6 +149,16 @@ export default function ProfileScreen(props) {
       <Text style={styles.text}>
         Experience Points: {user.experience_points}
       </Text>
+
+      <Text>Plant you have identified:</Text>
+      {/* User's plant section */}
+      <FlatList
+        data={plantNames}
+        renderItem={renderPlantName}
+        keyExtractor={(item, index) => index.toString()}
+        style={styles.plantList}
+      />
+
       <Button title="Log Out" onPress={handleSignOut} />
     </View>
   );

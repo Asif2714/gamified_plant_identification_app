@@ -11,5 +11,6 @@ backend/backend/__pycache__/
 
 
 
-#ignoring identicons - might be included later | stored in Amazon S3
-backend/media/profile_pictures/
+#ignoring identicons and plant images - might be included later | stored in Amazon S3
+backend/media/
+

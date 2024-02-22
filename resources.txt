@@ -22,6 +22,7 @@ https://reactnavigation.org/docs/stack-navigator/
 https://reactnative.dev/docs/asyncstorage -> persistent key value storage
 https://www.freecodecamp.org/news/context-api-in-react/
 https://legacy.reactjs.org/docs/context.html -> Context api
+https://reactnative.dev/docs/using-a-listview -> list, flatlist, for listing up plants
 
 Tutorials:
 https://www.youtube.com/watch?v=4fT2kmTWGwE&list=PLgjw1dR712joAlRdIc6BMNhX6_hrsL7kE&index=3 -> React native Bottom Tabs

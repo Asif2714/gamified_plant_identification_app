@@ -22,9 +22,11 @@ class Plant(models.Model):
     common_name = models.CharField(max_length=255)
     date_time_taken = models.DateTimeField()
     gps_coordinates = models.CharField(max_length=100) # Could use GeoDjango if required(!)
+    image = models.ImageField(upload_to='plant_images/')
+
 
     def __str__(self):
-        return f"{self.common_name} by {self.user.profile_name}"
+        return f"{self.common_name} ({self.scientific_name}) by {self.user.username}"
 
 
 #
