@@ -26,7 +26,7 @@ class Plant(models.Model):
 
 
     def __str__(self):
-        return f"{self.common_name} by {self.user.profile_name}"
+        return f"{self.common_name} ({self.scientific_name}) by {self.user.username}"
 
 
 #

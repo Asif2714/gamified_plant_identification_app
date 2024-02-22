@@ -9,4 +9,5 @@ urlpatterns = [
     path('user-details/', views.get_user_details, name='user-details'),
     path('logout/', views.logout, name='logout'),
     path('save-plant-details/', views.save_plant_details, name='save_plant_details'),
+    path('get-user-plants/<str:username>/', views.get_user_plants, name='get_user_plants'),
 ]

@@ -8,15 +8,6 @@ import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from 'expo-location';
 
-const options = {
-  title: "Select Image",
-  type: "library",
-  options: {
-    selectionLimit: 1,
-    mediaType: "photo",
-    includeBase64: false,
-  },
-};
 
 const ipAddress = "10.0.2.2";
 
@@ -57,12 +48,15 @@ export default function TakeImageScreen() {
         let responseJson = await response.json();
         console.log(responseJson, "responseJson");
         setImageDetails(responseJson); // Save the details for later use
+        console.log("Image details!")
+        console.log(imageDetails)
+        console.log("Image details! done")
 
         const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence}`;
 
         
         Alert.alert('Identification Results', formattedResponse, [
-          { text: 'OK', onPress: () => showSaveConfirmation(image) }
+          { text: 'OK', onPress: () => showSaveConfirmation(image, responseJson) }
         ]);
 
       } catch (error) {
@@ -75,21 +69,27 @@ export default function TakeImageScreen() {
     }
   };
 
-  const showSaveConfirmation = (image) => {
+  const showSaveConfirmation = (image, details) => {
     Alert.alert(
       'Save Picture',
       'Do you want to save this picture?',
       [
         { text: 'No' },
-        { text: 'Yes', onPress: () => saveImageDetails(image) }
+        { text: 'Yes', onPress: () => saveImageDetails(image, details) } 
       ]
     );
   };
 
 
   // Saving the image to django backend
-  const saveImageDetails = async (selectedImage) => {
+  const saveImageDetails = async (selectedImage, details) => {
     const username = await AsyncStorage.getItem('username');
+
+    // if (!imageDetails) {
+    //   console.error('Image details are not available.');
+    //   Alert.alert('Error', 'Image details are not available.');
+    //   return;
+    // }
 
     // Get GPS location
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -109,8 +109,8 @@ export default function TakeImageScreen() {
       type: 'image/jpeg',
       name: 'plant.jpg'
     });
-    formData.append('scientific_name', imageDetails.scientific_name);
-    formData.append('common_name', imageDetails.common_name);
+    formData.append('scientific_name', details.scientific_name);
+    formData.append('common_name', details.common_name);
     formData.append('gps_coordinates', gpsCoordinates);
     formData.append('username', username);
 
@@ -134,6 +134,8 @@ export default function TakeImageScreen() {
       Alert.alert('Error', 'An error occurred while saving plant details.');
     }
   };
+
+  
 
   const testServerConnection = async () => {
     try {

@@ -161,6 +161,19 @@ def get_user_details(request):
 
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
+    
+
+@csrf_exempt
+def get_user_plants(request, username):
+    
+    try:
+        user = User.objects.get(username=username)
+        plants = Plant.objects.filter(user=user)
+        plant_names = [plant.common_name for plant in plants]
+        return JsonResponse({'plants': plant_names})
+    
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found!'}, status=404)
 
 # View functions for relevant plant details
 
