@@ -4,6 +4,10 @@ import { UserContext } from "../contexts/UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from '@react-navigation/native';
 
+
+// Importing components
+import ProfilePlantCarousel from "../components/ProfilePlantCarousel";
+
 const ipAddress = "10.0.2.2";
 
 export default function ProfileScreen(props) {
@@ -11,7 +15,7 @@ export default function ProfileScreen(props) {
   const [isLoading, setIsLoading] = useState(true);
 
   // Storing list and details of plants for user
-  const [plantNames, setPlantNames] = useState([]);
+  const [userPlantDetails, setUserPlantDetails] = useState([]);
 
   const fetchUserDetails = async () => {
     const username = await AsyncStorage.getItem("username");
@@ -83,12 +87,14 @@ export default function ProfileScreen(props) {
 
     try {
       const response = await fetch(
-        `http://${ipAddress}:8000/get-user-plants/${username}/`
+        `http://${ipAddress}:8000/get-user-plants-with-details/${username}/`
       );
       const json = await response.json();
 
       if (response.ok) {
-        setPlantNames(json.plants); // You should have a state variable 'plantNames' defined to hold this data
+        setUserPlantDetails(json);
+        console.log(`plant details set`)
+        // console.log(json)
       } else {
         console.error("Failed to fetch plant names");
       }
@@ -152,12 +158,16 @@ export default function ProfileScreen(props) {
 
       <Text>Plant you have identified:</Text>
       {/* User's plant section */}
-      <FlatList
+      {/* <FlatList
         data={plantNames}
         renderItem={renderPlantName}
         keyExtractor={(item, index) => index.toString()}
         style={styles.plantList}
-      />
+      /> */}
+      {/* TODO: react native reanimated carousel */}
+      <ProfilePlantCarousel userPlantDetails={userPlantDetails}>
+        
+      </ProfilePlantCarousel>
 
       <Button title="Log Out" onPress={handleSignOut} />
     </View>

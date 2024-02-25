@@ -30,6 +30,7 @@ import imghdr
 import base64
 from io import BytesIO
 from django.utils import timezone
+from django.core.serializers import serialize
 
 
 
@@ -163,17 +164,6 @@ def get_user_details(request):
         return JsonResponse({'error': 'Invalid request'}, status=400)
     
 
-@csrf_exempt
-def get_user_plants(request, username):
-    
-    try:
-        user = User.objects.get(username=username)
-        plants = Plant.objects.filter(user=user)
-        plant_names = [plant.common_name for plant in plants]
-        return JsonResponse({'plants': plant_names})
-    
-    except User.DoesNotExist:
-        return JsonResponse({'error': 'User not found!'}, status=404)
 
 # View functions for relevant plant details
 
@@ -221,7 +211,36 @@ def save_plant_details(request):
         # Only allow POST requests
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
-
+@csrf_exempt
+def get_user_plants(request, username):
+    
+    try:
+        user = User.objects.get(username=username)
+        plants = Plant.objects.filter(user=user)
+        plant_names = [plant.common_name for plant in plants]
+        return JsonResponse({'plants': plant_names})
+    
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found!'}, status=404)
+    
+@csrf_exempt
+def get_user_plant_with_details(request, username):
+    if request.method == 'GET':
+        user = User.objects.get(username=username)
+        plants = Plant.objects.filter(user=user)
+        serialized_plants_data = serialize("json", plants)
+        # plants_data = {
+        #             # 'user': plants.user,
+        #             'scientific_name': plants.scientific_name,
+        #             'common_name': plants.common_name,
+        #             'date_time_taken': plants.date_time_taken,
+        #             'gps_coordinates': plants.gps_coordinates,
+        #             'image': plants.image.url if plants.image else None,
+        #         }
+        return JsonResponse({'plants_data': serialized_plants_data})
+    else:
+        # Only allow GET requests
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
 
