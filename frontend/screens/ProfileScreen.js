@@ -21,8 +21,9 @@ export default function ProfileScreen(props) {
     const username = await AsyncStorage.getItem("username");
     console.log(`fetching user details with username: ${username}`);
     try {
+      request =  `http://${ipAddress}:8000/user-details/?username=${username}`
       const response = await fetch(
-        `http://${ipAddress}:8000/user-details/?username=${username}`,
+        request,
         {
           method: "GET",
           headers: {
@@ -41,6 +42,7 @@ export default function ProfileScreen(props) {
       }
     } catch (error) {
       console.error("Error fetching user details:", error);
+      console.error(`request: ${request}`)
     }
   };
 
@@ -150,7 +152,7 @@ export default function ProfileScreen(props) {
         //TODO: shift to amazon s3, or update this url later to not have emulator ip.
         source={{ uri: `http://10.0.2.2:8000${user.profile_picture}` }}
         style={styles.image}
-        onError={(e) => console.log(e.nativeEvent.error)} // Log image load errors
+        onError={(e) => console.log(e.nativeEvent.error)} 
       />
       <Text style={styles.text}>
         Experience Points: {user.experience_points}
@@ -165,9 +167,10 @@ export default function ProfileScreen(props) {
         style={styles.plantList}
       /> */}
       {/* TODO: react native reanimated carousel */}
-      <ProfilePlantCarousel userPlantDetails={userPlantDetails}>
+      {/* <ProfilePlantCarousel userPlantDetails={userPlantDetails}>
         
-      </ProfilePlantCarousel>
+      </ProfilePlantCarousel> */}
+      <Text>Custom carousel placeholder</Text>
 
       <Button title="Log Out" onPress={handleSignOut} />
     </View>

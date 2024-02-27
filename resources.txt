@@ -32,3 +32,8 @@ https://youtu.be/-1tUW-Vvkxk?t=305 -> passing functions as props in React Native
 
 Issues:
 https://stackoverflow.com/questions/8381193/handle-json-decode-error-when-nothing-returned -> JsonDecodeErrors
+
+
+Others
+https://github.com/ropensci/rredlist/issues/52 -> IUCN red list bypass
+public token (for non-commercial username): 9bb4facb6d23f48efbf424bb05c0c1ef1cf6f468393bc745d42179ac4aca5fee
