@@ -1,13 +1,21 @@
-import React, { useState, useEffect, useContext, useCallback  } from "react";
-import { View, Text, StyleSheet, Button, Image, FlatList } from "react-native";
+import React, { useState, useEffect, useContext, useCallback } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  Image,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
 import { UserContext } from "../contexts/UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect } from '@react-navigation/native';
-
+import { useFocusEffect } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/Ionicons";
 
 // Importing components
-import ProfilePlantCarousel from "../components/ProfilePlantCarousel";
-import Slider from "../components/Slider"
+// import ProfilePlantCarousel from "../components/ProfilePlantCarousel";
+import Slider from "../components/Slider";
 
 const ipAddress = "10.0.2.2";
 
@@ -22,17 +30,14 @@ export default function ProfileScreen(props) {
     const username = await AsyncStorage.getItem("username");
     console.log(`fetching user details with username: ${username}`);
     try {
-      request =  `http://${ipAddress}:8000/user-details/?username=${username}`
-      const response = await fetch(
-        request,
-        {
-          method: "GET",
-          headers: {
-            // Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      request = `http://${ipAddress}:8000/user-details/?username=${username}`;
+      const response = await fetch(request, {
+        method: "GET",
+        headers: {
+          // Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       const data = await response.json();
       if (response.ok) {
         console.log(data);
@@ -43,7 +48,7 @@ export default function ProfileScreen(props) {
       }
     } catch (error) {
       console.error("Error fetching user details:", error);
-      console.error(`request: ${request}`)
+      console.error(`request: ${request}`);
     }
   };
 
@@ -86,7 +91,7 @@ export default function ProfileScreen(props) {
   };
 
   const fetchUserPlants = async () => {
-    console.log("Fetching user plants")
+    console.log("Fetching user plants");
     const username = await AsyncStorage.getItem("username");
 
     try {
@@ -117,17 +122,16 @@ export default function ProfileScreen(props) {
     return <Text style={styles.plantName}>{item}</Text>;
   };
 
-
   // fetch userplants everytime the page is loaded
   useFocusEffect(
     useCallback(() => {
       const fetchPlants = async () => {
-        const username = await AsyncStorage.getItem('username');
+        const username = await AsyncStorage.getItem("username");
         if (username) {
           fetchUserPlants();
         }
       };
-  
+
       fetchPlants();
     }, [])
   );
@@ -147,37 +151,44 @@ export default function ProfileScreen(props) {
   }
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Username: {user.username}</Text>
-      <Text style={styles.text}>Email: {user.email}</Text>
-      <Text style={styles.text}>Profile Name: {user.profile_name}</Text>
-      <Image
-        //TODO: shift to amazon s3, or update this url later to not have emulator ip.
-        source={{ uri: `http://10.0.2.2:8000${user.profile_picture}` }}
-        style={styles.image}
-        onError={(e) => console.log(e.nativeEvent.error)} 
-      />
-      <Text style={styles.text}>
-        Experience Points: {user.experience_points}
-      </Text>
+      <View style={styles.userInfoSection}>
+        <View style={styles.header}>
+          <View style={styles.leftSection}>
+            <Text style={styles.text}>
+              Profile Name: {user.profile_name || "Not set"}
+            </Text>
+            <Text style={styles.text}>Email: {user.email}</Text>
+            <Text style={styles.text}>
+              Experience Points: {user.experience_points}
+            </Text>
+          </View>
+          <View style={styles.rightSection}>
+            <Image
+              source={{
+                uri:
+                  `http://10.0.2.2:8000${user.profile_picture}` ||
+                  "default_image_placeholder",
+              }}
+              style={styles.profileImage}
+              onError={(e) => console.log(e.nativeEvent.error)}
+            />
+            <Text style={[styles.text, styles.username]}>
+              {/* Username: {user.username} */}
+              {user.username}
+            </Text>
+          </View>
+        </View>
+      </View>
 
       <Text>Plant you have identified:</Text>
-      {/* User's plant section */}
-      {/* <FlatList
-        data={plantNames}
-        renderItem={renderPlantName}
-        keyExtractor={(item, index) => index.toString()}
-        style={styles.plantList}
-      /> */}
-      {/* TODO: react native reanimated carousel */}
-      {/* <ProfilePlantCarousel userPlantDetails={userPlantDetails}>
-        
-      </ProfilePlantCarousel> */}
-      <Text>Custom carousel placeholder</Text>
+      <Slider userPlantDetails={userPlantDetails} />
 
-        <Slider userPlantDetails={userPlantDetails}/>
-
-
+      <View style={styles.buttonContainer}>
+      <Button title="See Map"></Button>
+      <Button title="Settings"></Button>
       <Button title="Log Out" onPress={handleSignOut} />
+    </View>
+
     </View>
   );
 }
@@ -187,14 +198,66 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#f5f5f5",
   },
   text: {
     fontSize: 16,
-    marginBottom: 10,
+    // marginBottom: 10,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
+    borderRadius: 7,
     marginBottom: 10,
   },
+  userInfoSection: {
+    width: "100%",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
+  },
+  userInfoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  icon: {
+    marginRight: 10,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  leftSection: {
+    justifyContent: "center",
+  },
+  rightSection: {
+    alignItems: "center",
+  },
+  profileImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 7,
+    backgroundColor: "#ccc", // Placeholder color
+  },
+  username: {
+    marginTop: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    width: '100%',
+    padding: 12,
+    
+  }
 });

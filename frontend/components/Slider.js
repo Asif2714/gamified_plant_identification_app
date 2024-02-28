@@ -2,6 +2,7 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 
 import React from "react";
 import SlideItem from "./SlideItem";
+import Pagination from "./Pagination";
 
 const Slider = (props) => {
   console.log("inside slider");
@@ -13,11 +14,19 @@ const Slider = (props) => {
   }
 
   return (
-    <FlatList
-      data={props.userPlantDetails}
-      renderItem={({ item }) => <SlideItem item={item.fields} />}
-      keyExtractor={(item, index) => String(index)}
-    />
+    <>
+      <FlatList
+        data={props.userPlantDetails}
+        renderItem={({ item }) => <SlideItem item={item.fields} />}
+        keyExtractor={(item, index) => String(index)}
+        horizontal
+        pagingEnabled
+        snapToAlignment="center"
+        showsHorizontalScrollIndicator={false}
+      />
+      <Pagination data = {props.userPlantDetails}/>
+
+    </>
   );
 };
 

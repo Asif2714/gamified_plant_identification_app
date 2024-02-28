@@ -25,10 +25,14 @@ https://legacy.reactjs.org/docs/context.html -> Context api
 https://reactnative.dev/docs/using-a-listview -> list, flatlist, for listing up plants
 https://github.com/meliorence/react-native-snap-carousel -> carousel for plant images
 https://www.letscodemore.com/blog/object-of-type-queryset-is-not-json-serializable/ -> serializing full plant data
+https://www.npmjs.com/package/react-moment -> date conversion from datetime
+
 
 Tutorials:
 https://www.youtube.com/watch?v=4fT2kmTWGwE&list=PLgjw1dR712joAlRdIc6BMNhX6_hrsL7kE&index=3 -> React native Bottom Tabs
 https://youtu.be/-1tUW-Vvkxk?t=305 -> passing functions as props in React Native
+https://www.youtube.com/watch?v=2TgArwz6je8&t=352s -> RN custom carousel
+
 
 Issues:
 https://stackoverflow.com/questions/8381193/handle-json-decode-error-when-nothing-returned -> JsonDecodeErrors
