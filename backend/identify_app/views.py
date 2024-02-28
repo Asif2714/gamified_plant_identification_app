@@ -255,6 +255,29 @@ def get_user_plant_with_details(request, username):
         return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
+#Leaderboard system view functions
+def get_leaderboard(request):
+    if request.method == 'GET':
+        # sorting by descending on XP points
+        users = User.objects.all().exclude(username='admin').order_by('-experience_points')
+
+        users_data = []
+        for user in users:
+            user_data = {
+                'id': user.id,
+                'username': user.username,
+                'profile_name': user.profile_name,
+                'experience_points': user.experience_points,
+                'profile_picture': user.profile_picture.url if user.profile_picture else None
+            }
+            users_data.append(user_data)
+
+
+        return JsonResponse(users_data, safe=False)
+    else:
+        return JsonResponse({'error':  'Invalid request method'}, status=400)
+        
+
 
 # View functions for predictions
 
