@@ -26,6 +26,8 @@ https://reactnative.dev/docs/using-a-listview -> list, flatlist, for listing up 
 https://github.com/meliorence/react-native-snap-carousel -> carousel for plant images
 https://www.letscodemore.com/blog/object-of-type-queryset-is-not-json-serializable/ -> serializing full plant data
 https://www.npmjs.com/package/react-moment -> date conversion from datetime
+https://reactnative.dev/docs/flexbox?language=typescript -> flexbox info for justifycontent, align etc.
+https://docs.djangoproject.com/en/2.0/ref/models/querysets/#update -> Django updating a specific model (for XP system)
 
 
 Tutorials:

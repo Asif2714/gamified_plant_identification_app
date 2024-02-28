@@ -15,6 +15,9 @@ const Slider = (props) => {
 
   return (
     <>
+    {/* TODO: only render the last 10 if there are more than 10 pics */}
+    {/* TODO: complete full pagination styling and animations later: follow */}
+    {/* Continue from https://youtu.be/2TgArwz6je8?t=644 */}
       <FlatList
         data={props.userPlantDetails}
         renderItem={({ item }) => <SlideItem item={item.fields} />}

@@ -113,6 +113,7 @@ export default function TakeImageScreen() {
     formData.append('common_name', details.common_name);
     formData.append('gps_coordinates', gpsCoordinates);
     formData.append('username', username);
+    formData.append('confidence', details.confidence)
 
     try {
       const response = await fetch(`http://${ipAddress}:8000/save-plant-details/`, {

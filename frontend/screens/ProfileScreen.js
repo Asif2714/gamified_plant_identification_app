@@ -115,12 +115,14 @@ export default function ProfileScreen(props) {
   useEffect(() => {
     if (user) {
       fetchUserPlants();
+    //   fetchUserDetails();
     }
   }, [user]);
 
-  const renderPlantName = ({ item }) => {
-    return <Text style={styles.plantName}>{item}</Text>;
-  };
+  useEffect(() => {
+    fetchUserDetails();
+  }, []); 
+
 
   // fetch userplants everytime the page is loaded
   useFocusEffect(
@@ -133,6 +135,12 @@ export default function ProfileScreen(props) {
       };
 
       fetchPlants();
+    }, [])
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserDetails();
     }, [])
   );
 
@@ -204,12 +212,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     // marginBottom: 10,
   },
-  image: {
-    width: 80,
-    height: 80,
-    borderRadius: 7,
-    marginBottom: 10,
-  },
   userInfoSection: {
     width: "100%",
     backgroundColor: "#fff",
@@ -247,7 +249,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 7,
-    backgroundColor: "#ccc", // Placeholder color
+    backgroundColor: "#ccc",
   },
   username: {
     marginTop: 10,

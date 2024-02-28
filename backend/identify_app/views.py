@@ -22,7 +22,7 @@ User = auth.get_user_model()
 
 # PyTorch related imports
 import torch
-import torch.nn.functional as F
+import torch.nn.functional as torch_functional
 import torchvision.models as models
 import torchvision.transforms as transforms
 from PIL import Image
@@ -31,6 +31,7 @@ import base64
 from io import BytesIO
 from django.utils import timezone
 from django.core.serializers import serialize
+from django.db.models import F
 
 
 
@@ -192,8 +193,19 @@ def save_plant_details(request):
                 image=image_file,
                 date_time_taken=timezone.now()
             )
+            # Increasing player score, TODO: Include more variables such as confidence and rarity
+
+            # multiplier = getConfidenceMultiplier(request.POST.get('confidence'))
+            print("USer xp before", user.experience_points)
+            user.experience_points = F('experience_points') + 100
+            user.save()
+            print("USer xp after", user.experience_points)
 
             plant.image.save(filename, image_file, save=True)
+
+            
+            
+
 
             # Return a success response
             return JsonResponse({'success': 'Plant details saved successfully.'}, status=200)
@@ -325,7 +337,7 @@ def predict_image(request):
             input_img = preprocess_img(image_file)
             with torch.no_grad():
                 output = model(input_img)
-                probabilities = F.softmax(output, dim=1)
+                probabilities = torch_functional.softmax(output, dim=1)
                 confidence, predicted_class = probabilities.max(1)
 
                 if confidence.item() > 0.1:
