@@ -7,6 +7,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 // Importing components
 import ProfilePlantCarousel from "../components/ProfilePlantCarousel";
+import Slider from "../components/Slider"
 
 const ipAddress = "10.0.2.2";
 
@@ -85,6 +86,7 @@ export default function ProfileScreen(props) {
   };
 
   const fetchUserPlants = async () => {
+    console.log("Fetching user plants")
     const username = await AsyncStorage.getItem("username");
 
     try {
@@ -94,9 +96,9 @@ export default function ProfileScreen(props) {
       const json = await response.json();
 
       if (response.ok) {
-        setUserPlantDetails(json);
-        console.log(`plant details set`)
-        // console.log(json)
+        const plantDetails = JSON.parse(json.plants_data);
+        setUserPlantDetails(plantDetails);
+        // console.log("Plant details set:", plantDetails);
       } else {
         console.error("Failed to fetch plant names");
       }
@@ -171,6 +173,9 @@ export default function ProfileScreen(props) {
         
       </ProfilePlantCarousel> */}
       <Text>Custom carousel placeholder</Text>
+
+        <Slider userPlantDetails={userPlantDetails}/>
+
 
       <Button title="Log Out" onPress={handleSignOut} />
     </View>
