@@ -22,7 +22,7 @@ User = auth.get_user_model()
 
 # PyTorch related imports
 import torch
-import torch.nn.functional as F
+import torch.nn.functional as torch_functional
 import torchvision.models as models
 import torchvision.transforms as transforms
 from PIL import Image
@@ -30,7 +30,10 @@ import imghdr
 import base64
 from io import BytesIO
 from django.utils import timezone
+from django.core.serializers import serialize
+from django.db.models import F
 
+import random
 
 
 
@@ -163,17 +166,6 @@ def get_user_details(request):
         return JsonResponse({'error': 'Invalid request'}, status=400)
     
 
-@csrf_exempt
-def get_user_plants(request, username):
-    
-    try:
-        user = User.objects.get(username=username)
-        plants = Plant.objects.filter(user=user)
-        plant_names = [plant.common_name for plant in plants]
-        return JsonResponse({'plants': plant_names})
-    
-    except User.DoesNotExist:
-        return JsonResponse({'error': 'User not found!'}, status=404)
 
 # View functions for relevant plant details
 
@@ -202,8 +194,19 @@ def save_plant_details(request):
                 image=image_file,
                 date_time_taken=timezone.now()
             )
+            # Increasing player score, TODO: Include more variables such as confidence and rarity
+
+            # multiplier = getConfidenceMultiplier(request.POST.get('confidence'))
+            print("USer xp before", user.experience_points)
+            user.experience_points = F('experience_points') + 100
+            user.save()
+            print("USer xp after", user.experience_points)
 
             plant.image.save(filename, image_file, save=True)
+
+            
+            
+
 
             # Return a success response
             return JsonResponse({'success': 'Plant details saved successfully.'}, status=200)
@@ -221,9 +224,94 @@ def save_plant_details(request):
         # Only allow POST requests
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
+@csrf_exempt
+def get_user_plants(request, username):
+    
+    try:
+        user = User.objects.get(username=username)
+        plants = Plant.objects.filter(user=user)
+        plant_names = [plant.common_name for plant in plants]
+        return JsonResponse({'plants': plant_names})
+    
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found!'}, status=404)
+    
+@csrf_exempt
+def get_user_plant_with_details(request, username):
+    if request.method == 'GET':
+        user = User.objects.get(username=username)
+        plants = Plant.objects.filter(user=user)
+        serialized_plants_data = serialize("json", plants)
+        # plants_data = {
+        #             # 'user': plants.user,
+        #             'scientific_name': plants.scientific_name,
+        #             'common_name': plants.common_name,
+        #             'date_time_taken': plants.date_time_taken,
+        #             'gps_coordinates': plants.gps_coordinates,
+        #             'image': plants.image.url if plants.image else None,
+        #         }
+        return JsonResponse({'plants_data': serialized_plants_data})
+    else:
+        # Only allow GET requests
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
+#Leaderboard system view functions
+def get_leaderboard(request):
+    if request.method == 'GET':
+        # sorting by descending on XP points
+        users = User.objects.all().exclude(username='admin').order_by('-experience_points')
 
+        users_data = []
+        for user in users:
+            user_data = {
+                'id': user.id,
+                'username': user.username,
+                'profile_name': user.profile_name,
+                'experience_points': user.experience_points,
+                'profile_picture': user.profile_picture.url if user.profile_picture else None
+            }
+            users_data.append(user_data)
+
+
+        return JsonResponse(users_data, safe=False)
+    else:
+        return JsonResponse({'error':  'Invalid request method'}, status=400)
+        
+
+
+# Home feed: Getting recent user images
+    
+def get_plants_for_homepage(request):
+    if request.method == 'GET':
+
+        # Getting top/most recent 15 and then selecting 10 of them randomly
+        # (creating uniqueness to feed)
+        plants_top15 = Plant.objects.all().order_by('-date_time_taken')[:15]
+        plants_top15_list = list(plants_top15)
+        random.shuffle(plants_top15_list)
+        plants = plants_top15_list[:10]
+        
+
+        plants_data = []
+        for plant in plants:
+            plant_data = {
+                'id': plant.id,
+                'user': plant.user.username,
+                'user_profile_picture': plant.user.profile_picture.url if plant.user.profile_picture else None,
+                'scientific_name': plant.scientific_name,
+                'common_name': plant.common_name,
+                'date_time_taken': plant.date_time_taken,
+                'plant_image': plant.image.url if plant.image else None,
+                'rarity': plant.rarity,
+                'type':"user_submitted_plant",
+            }
+            plants_data.append(plant_data)
+
+        return JsonResponse(plants_data, safe=False)
+    
+    else:
+        return JsonResponse({'error':  'Invalid request method'}, status=400)
 
 # View functions for predictions
 
@@ -306,7 +394,7 @@ def predict_image(request):
             input_img = preprocess_img(image_file)
             with torch.no_grad():
                 output = model(input_img)
-                probabilities = F.softmax(output, dim=1)
+                probabilities = torch_functional.softmax(output, dim=1)
                 confidence, predicted_class = probabilities.max(1)
 
                 if confidence.item() > 0.1:

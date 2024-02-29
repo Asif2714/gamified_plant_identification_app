@@ -23,6 +23,7 @@ class Plant(models.Model):
     date_time_taken = models.DateTimeField()
     gps_coordinates = models.CharField(max_length=100) # Could use GeoDjango if required(!)
     image = models.ImageField(upload_to='plant_images/')
+    rarity = models.CharField(max_length=30, default='None')
 
 
     def __str__(self):

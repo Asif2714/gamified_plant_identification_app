@@ -23,10 +23,23 @@ https://reactnative.dev/docs/asyncstorage -> persistent key value storage
 https://www.freecodecamp.org/news/context-api-in-react/
 https://legacy.reactjs.org/docs/context.html -> Context api
 https://reactnative.dev/docs/using-a-listview -> list, flatlist, for listing up plants
+https://github.com/meliorence/react-native-snap-carousel -> carousel for plant images
+https://www.letscodemore.com/blog/object-of-type-queryset-is-not-json-serializable/ -> serializing full plant data
+https://www.npmjs.com/package/react-moment -> date conversion from datetime
+https://reactnative.dev/docs/flexbox?language=typescript -> flexbox info for justifycontent, align etc.
+https://docs.djangoproject.com/en/2.0/ref/models/querysets/#update -> Django updating a specific model (for XP system)
+https://www.w3schools.com/django/django_queryset_orderby.php -> Djanog queryset orderby (for leaderboard system)
 
 Tutorials:
 https://www.youtube.com/watch?v=4fT2kmTWGwE&list=PLgjw1dR712joAlRdIc6BMNhX6_hrsL7kE&index=3 -> React native Bottom Tabs
 https://youtu.be/-1tUW-Vvkxk?t=305 -> passing functions as props in React Native
+https://www.youtube.com/watch?v=2TgArwz6je8&t=352s -> RN custom carousel
+
 
 Issues:
 https://stackoverflow.com/questions/8381193/handle-json-decode-error-when-nothing-returned -> JsonDecodeErrors
+https://stackoverflow.com/questions/7497138/how-do-i-serialize-an-imagefield-in-django -> serializing imagefield
+
+Others
+https://github.com/ropensci/rredlist/issues/52 -> IUCN red list bypass
+public token (for non-commercial username): 9bb4facb6d23f48efbf424bb05c0c1ef1cf6f468393bc745d42179ac4aca5fee
