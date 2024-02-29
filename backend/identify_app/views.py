@@ -33,6 +33,7 @@ from django.utils import timezone
 from django.core.serializers import serialize
 from django.db.models import F
 
+import random
 
 
 
@@ -278,6 +279,39 @@ def get_leaderboard(request):
         return JsonResponse({'error':  'Invalid request method'}, status=400)
         
 
+
+# Home feed: Getting recent user images
+    
+def get_plants_for_homepage(request):
+    if request.method == 'GET':
+
+        # Getting top/most recent 15 and then selecting 10 of them randomly
+        # (creating uniqueness to feed)
+        plants_top15 = Plant.objects.all().order_by('-date_time_taken')[:15]
+        plants_top15_list = list(plants_top15)
+        random.shuffle(plants_top15_list)
+        plants = plants_top15_list[:10]
+        
+
+        plants_data = []
+        for plant in plants:
+            plant_data = {
+                'id': plant.id,
+                'user': plant.user.username,
+                'user_profile_picture': plant.user.profile_picture.url if plant.user.profile_picture else None,
+                'scientific_name': plant.scientific_name,
+                'common_name': plant.common_name,
+                'date_time_taken': plant.date_time_taken,
+                'plant_image': plant.image.url if plant.image else None,
+                'rarity': plant.rarity,
+                'type':"user_submitted_plant",
+            }
+            plants_data.append(plant_data)
+
+        return JsonResponse(plants_data, safe=False)
+    
+    else:
+        return JsonResponse({'error':  'Invalid request method'}, status=400)
 
 # View functions for predictions
 
