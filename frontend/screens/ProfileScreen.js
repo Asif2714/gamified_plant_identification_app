@@ -12,6 +12,8 @@ import { UserContext } from "../contexts/UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { Modal } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 
 // Importing components
 // import ProfilePlantCarousel from "../components/ProfilePlantCarousel";
@@ -22,9 +24,12 @@ const ipAddress = "10.0.2.2";
 export default function ProfileScreen(props) {
   const { user, setUser, setUserToken, setUserId } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMapVisible, setIsMapVisible] = useState(false);
 
   // Storing list and details of plants for user
   const [userPlantDetails, setUserPlantDetails] = useState([]);
+  
+  
 
   const fetchUserDetails = async () => {
     const username = await AsyncStorage.getItem("username");
@@ -112,6 +117,50 @@ export default function ProfileScreen(props) {
     }
   };
 
+
+  const toggleMap = () => {
+    setIsMapVisible(!isMapVisible);
+  };
+
+  const getMarkerColor = (rarity) => {
+    switch (rarity) {
+      case 'None':
+        return 'gray';
+      default:
+        return 'blue';
+    }
+  };
+
+  const CustomMarker = ({ color }) => (
+    <View style={[styles.marker, { backgroundColor: color }]}>
+    </View>
+  );
+
+
+  const renderMapMarkers = () => {
+    return userPlantDetails.map((plant, index) => {
+      const [latitude, longitude] = plant.fields.gps_coordinates.split(',');
+      console.log(latitude, longitude)
+      const markerColor = getMarkerColor(plant.fields.rarity);
+      const imageUri = `http://${ipAddress}:8000${plant.fields.image}`; //TODO: add image to marker
+      return (
+        <Marker
+          key={index}
+          coordinate={{
+            latitude: parseFloat(latitude),
+            longitude: parseFloat(longitude)
+          }}
+          title={plant.fields.common_name}
+          description={plant.fields.scientific_name}
+        >
+          {/* Using CustomMarker instead of pinColor, pincolor doesn't work and pin stays red */}
+          <CustomMarker color={markerColor} />
+        </Marker>
+      );
+    });
+  };
+
+
   useEffect(() => {
     if (user) {
       fetchUserPlants();
@@ -143,6 +192,8 @@ export default function ProfileScreen(props) {
       fetchUserDetails();
     }, [])
   );
+
+
 
   if (isLoading) {
     return <Text>Loading...</Text>;
@@ -192,9 +243,35 @@ export default function ProfileScreen(props) {
       <Slider userPlantDetails={userPlantDetails} />
 
       <View style={styles.buttonContainer}>
-      <Button title="See Map"></Button>
+      <Button title="See Map" onPress={toggleMap} />
       <Button title="Settings"></Button>
       <Button title="Log Out" onPress={handleSignOut} />
+
+
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={isMapVisible}
+        onRequestClose={toggleMap}
+      >
+        <View style={styles.mapContainer}>
+          <MapView
+            style={styles.map}
+            // Setting default plant loc
+            initialRegion={{
+              latitude: userPlantDetails.length > 0 ? parseFloat(userPlantDetails[0].fields.gps_coordinates.split(',')[0]) : 37.78825,
+              longitude: userPlantDetails.length > 0 ? parseFloat(userPlantDetails[0].fields.gps_coordinates.split(',')[1]) : -122.4324,
+              latitudeDelta: 0.004,
+              longitudeDelta: 0.004,
+            }}
+          >
+            {renderMapMarkers()}
+          </MapView>
+          <TouchableOpacity style={styles.closeMap} onPress={toggleMap}>
+  <Text style={styles.closeMapText}>Close Map</Text>
+</TouchableOpacity>
+        </View>
+      </Modal>
     </View>
 
     </View>
@@ -261,5 +338,43 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 12,
     
-  }
+  },
+  mapContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  closeMap: {
+    position: 'absolute',
+    bottom: 40,
+    alignSelf: 'center',
+    backgroundColor: '#F6FBF4',
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 15,
+    borderWidth: 3,
+    borderColor: '#195100',
+    elevation: 3, //shadow
+  },
+  closeMapText: {
+    color: '#252900',
+    fontWeight: 'bold',
+  },
+  marker: {
+    width: 20,
+    height: 20,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: 'white',
+  },
 });
+
+
+// #195100 main
+
+// #252900 sec
+
+// #F6FBF4 background
