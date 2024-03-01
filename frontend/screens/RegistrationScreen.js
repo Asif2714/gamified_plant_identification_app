@@ -85,6 +85,7 @@ const RegistrationScreen = ({ onRegistrationComplete }) => {
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
+      {/* TODO: add a Profile Name, currently its empty */}
       <Button title="Register" onPress={handleRegistration} />
     </View>
   );

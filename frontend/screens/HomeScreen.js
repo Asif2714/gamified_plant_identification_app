@@ -64,6 +64,7 @@ export default function HomeScreen() {
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
       />
+      {/* TODO: add a refresh feed button */}
     </>
   );
 }

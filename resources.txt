@@ -29,6 +29,9 @@ https://www.npmjs.com/package/react-moment -> date conversion from datetime
 https://reactnative.dev/docs/flexbox?language=typescript -> flexbox info for justifycontent, align etc.
 https://docs.djangoproject.com/en/2.0/ref/models/querysets/#update -> Django updating a specific model (for XP system)
 https://www.w3schools.com/django/django_queryset_orderby.php -> Djanog queryset orderby (for leaderboard system)
+https://www.npmjs.com/package/react-native-maps -> maps for plotting
+https://github.com/react-native-maps/react-native-maps/blob/master/docs/installation.md -> map setup
+
 
 Tutorials:
 https://www.youtube.com/watch?v=4fT2kmTWGwE&list=PLgjw1dR712joAlRdIc6BMNhX6_hrsL7kE&index=3 -> React native Bottom Tabs
