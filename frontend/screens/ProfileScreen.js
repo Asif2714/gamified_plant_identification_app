@@ -226,7 +226,7 @@ export default function ProfileScreen(props) {
               source={{
                 uri:
                   `http://10.0.2.2:8000${user.profile_picture}` ||
-                  "default_image_placeholder",
+                  "default_image_placeholder_TODO",
               }}
               style={styles.profileImage}
               onError={(e) => console.log(e.nativeEvent.error)}
