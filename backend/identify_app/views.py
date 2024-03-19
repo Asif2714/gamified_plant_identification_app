@@ -31,8 +31,7 @@ import base64
 from io import BytesIO
 from django.utils import timezone
 from django.core.serializers import serialize
-from django.db.models import F
-
+from django.db.models import F, Count
 import random
 
 
@@ -170,11 +169,11 @@ def get_user_details(request):
 # View functions for relevant plant details
 
 CONSERVATION_STATUS_SCORES = {
-    "CR": 600, # Critically Endangered
-    "EN": 500, # Endangered
-    "VU": 400, # Vulnerable
-    "NT": 300, # Near Threatened
-    "LC": 200, # Least Concerned
+    "CR": 500, # Critically Endangered
+    "EN": 300, # Endangered
+    "VU": 250, # Vulnerable
+    "NT": 200, # Near Threatened
+    "LC": 150, # Least Concerned
     "Not Listed": 100 # The baseline score
 }
 
@@ -230,10 +229,6 @@ def save_plant_details(request):
             print("USer xp after", user.experience_points)
 
             plant.image.save(filename, image_file, save=True)
-
-            
-            
-
 
             # Return a success response
             return JsonResponse({
@@ -335,6 +330,47 @@ def get_plants_for_homepage(request):
     
     else:
         return JsonResponse({'error':  'Invalid request method'}, status=400)
+
+'''
+CR -> Critically Endangered
+EN -> Endangered
+VU -> Vulnerable
+NT -> Near Threatened
+LC -> Least Concerned
+Not Listed
+'''
+
+@csrf_exempt
+def get_user_plant_counts(request, username):
+    if request.method == 'GET':
+        try:
+            RARITY= ['CR', 'EN', 'VU', 'NT', 'LC', 'Not Listed']
+            rarity_counts  = {rarity: 0 for rarity in RARITY}
+
+            user = User.objects.get(username = username)
+
+            # Count the plants by grouping them based on rarity
+            plants = Plant.objects.filter(user=user)
+            counts  = plants.values('rarity').annotate(count = Count('id')).order_by('rarity')
+
+            # Populating the rarity_counts array
+            for count in counts:
+                # Getting the Key from the data
+                rarity = count['rarity']
+                
+                # Setting the value
+                rarity_counts[rarity] = count['count']
+
+            # Restructure the response
+            formatted_counts = [{"rarity": rarity, "count": count} for rarity, count in rarity_counts.items()]
+
+            return JsonResponse({"rarity_counts": formatted_counts})
+    
+        except User.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
 
 # View functions for predictions
 
@@ -440,14 +476,6 @@ def predict_image(request):
     return JsonResponse({'error': 'Invalid request method'}, status=400)  #TODO: check if 400 is correct one for this
 
 
-'''
-CR -> Critically Endangered
-EN -> Endangered
-VU -> Vulnerable
-NT -> Near Threatened
-LC -> Least Concerned
-Not Listed
-'''
 
 
 
