@@ -52,7 +52,7 @@ export default function TakeImageScreen() {
         console.log(imageDetails)
         console.log("Image details! done")
 
-        const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence}`;
+        const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence} \nConservation Status (Rarity): ${responseJson.conservation_status}`;
 
         
         Alert.alert('Identification Results', formattedResponse, [
@@ -111,6 +111,7 @@ export default function TakeImageScreen() {
     });
     formData.append('scientific_name', details.scientific_name);
     formData.append('common_name', details.common_name);
+    formData.append('conservation_status', details.conservation_status);
     formData.append('gps_coordinates', gpsCoordinates);
     formData.append('username', username);
     formData.append('confidence', details.confidence)
@@ -125,8 +126,14 @@ export default function TakeImageScreen() {
         body: formData,
       });
 
+      let responseJson = await response.json();
+      console.log(responseJson)
+
+      const formattedResponse = `The plant has been saved successfully.\nYour achieved score: ${responseJson.final_score_increased}\nYour Total Score: ${responseJson.total_experience_points}`;
+
+
       if (response.ok) {
-        Alert.alert('Success', 'The plant has been saved successfully.');
+        Alert.alert('Save Succesful!', formattedResponse);
       } else {
         Alert.alert('Error', 'Could not save the plant details.');
       }

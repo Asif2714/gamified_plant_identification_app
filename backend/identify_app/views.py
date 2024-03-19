@@ -169,6 +169,15 @@ def get_user_details(request):
 
 # View functions for relevant plant details
 
+CONSERVATION_STATUS_SCORES = {
+    "CR": 600, # Critically Endangered
+    "EN": 500, # Endangered
+    "VU": 400, # Vulnerable
+    "NT": 300, # Near Threatened
+    "LC": 200, # Least Concerned
+    "Not Listed": 100 # The baseline score
+}
+
 @csrf_exempt
 def save_plant_details(request):
     print("attempting to save plant details")
@@ -180,7 +189,9 @@ def save_plant_details(request):
             print("got username!")
             scientific_name = request.POST.get('scientific_name')
             common_name = request.POST.get('common_name')
+            conservation_status = request.POST.get('conservation_status')
             gps_coordinates = request.POST.get('gps_coordinates')
+            confidence = float(request.POST.get('confidence'))
             image_file = request.FILES.get('file')
 
             filename = f"{user}_{scientific_name}.{image_file.name.split('.')[-1]}"
@@ -190,16 +201,32 @@ def save_plant_details(request):
                 user=user,
                 scientific_name=scientific_name,
                 common_name=common_name,
+                rarity= conservation_status,
                 gps_coordinates=gps_coordinates,
                 image=image_file,
                 date_time_taken=timezone.now()
             )
-            # Increasing player score, TODO: Include more variables such as confidence and rarity
+            # Baseline score baesd on Conservation status / rarity
+            score_increase = CONSERVATION_STATUS_SCORES.get(conservation_status, 100)
+
+            # Multiplier based on confidence
+            multiplier = 0
+            if 0.0 <= confidence <= 0.3:
+                multiplier = 0.3
+            elif 0.31 <= confidence <= 0.5:
+                multiplier = 0.5
+            elif 0.51 <= confidence <= 0.75:
+                multiplier = 0.75
+            else: 
+                multiplier = 1.0
+
+            final_score_increment = score_increase * multiplier
 
             # multiplier = getConfidenceMultiplier(request.POST.get('confidence'))
             print("USer xp before", user.experience_points)
-            user.experience_points = F('experience_points') + 100
+            user.experience_points = F('experience_points') + final_score_increment
             user.save()
+            user.refresh_from_db()
             print("USer xp after", user.experience_points)
 
             plant.image.save(filename, image_file, save=True)
@@ -209,7 +236,11 @@ def save_plant_details(request):
 
 
             # Return a success response
-            return JsonResponse({'success': 'Plant details saved successfully.'}, status=200)
+            return JsonResponse({
+                'success': 'Plant details saved successfully!',
+                'final_score_increased': final_score_increment,
+                'total_experience_points': user.experience_points 
+            }, status=200)
 
         except User.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
@@ -242,14 +273,6 @@ def get_user_plant_with_details(request, username):
         user = User.objects.get(username=username)
         plants = Plant.objects.filter(user=user)
         serialized_plants_data = serialize("json", plants)
-        # plants_data = {
-        #             # 'user': plants.user,
-        #             'scientific_name': plants.scientific_name,
-        #             'common_name': plants.common_name,
-        #             'date_time_taken': plants.date_time_taken,
-        #             'gps_coordinates': plants.gps_coordinates,
-        #             'image': plants.image.url if plants.image else None,
-        #         }
         return JsonResponse({'plants_data': serialized_plants_data})
     else:
         # Only allow GET requests
@@ -403,8 +426,9 @@ def predict_image(request):
                     if predicted_class_string in ordered_species_json:
                         classification = ordered_species_json[predicted_class_string]['plant_name']
                         common_name = ordered_species_json[predicted_class_string]['common_name']
+                        conservation_status = ordered_species_json[predicted_class_string]['conservation_status']
                         print("Successful")
-                        return JsonResponse({'scientific_name': classification, 'common_name': common_name, 'confidence': confidence.item()})
+                        return JsonResponse({'scientific_name': classification, 'common_name': common_name, 'conservation_status': conservation_status, 'confidence': confidence.item()})
                     else:
                         print("")
                         return JsonResponse({'error': 'Predicted class not in JSON'})
@@ -415,6 +439,15 @@ def predict_image(request):
  
     return JsonResponse({'error': 'Invalid request method'}, status=400)  #TODO: check if 400 is correct one for this
 
+
+'''
+CR -> Critically Endangered
+EN -> Endangered
+VU -> Vulnerable
+NT -> Near Threatened
+LC -> Least Concerned
+Not Listed
+'''
 
 
 
