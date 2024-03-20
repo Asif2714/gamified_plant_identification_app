@@ -14,4 +14,5 @@ urlpatterns = [
     path('leaderboard/', views.get_leaderboard, name='get_leaderboard'),
     path('plants-for-homepage/', views.get_plants_for_homepage, name='get_plants_for_homepage'),
     path('get-user-plant-counts/<str:username>/', views.get_user_plant_counts, name='get_user_plant_counts'),
+    path('get-user-achievements/<str:username>/', views.get_user_achievements, name='get_user_achievements'),
 ]

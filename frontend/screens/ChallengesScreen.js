@@ -13,7 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 
-import RarityInfoModal from '../modals/RarityInfoModal';
+import RarityInfoModal from "../modals/RarityInfoModal";
 
 const ipAddress = "10.0.2.2";
 
@@ -38,6 +38,8 @@ export default function ChallengesScreen() {
   });
 
   const [infoModalVisible, setInfoModalVisible] = useState(false);
+
+  const [achievements, setAchievements] = useState(null);
 
   const fetchRarityCounts = async () => {
     const username = await AsyncStorage.getItem("username");
@@ -76,10 +78,25 @@ export default function ChallengesScreen() {
     }
   };
 
+  const fetchAchievements = async () => {
+    const username = await AsyncStorage.getItem("username");
+    const response = await fetch(
+      `http://${ipAddress}:8000/get-user-achievements/${username}/`
+    );
+    if (response.ok) {
+      const data = await response.json();
+      setAchievements(data);
+      console.log(data);
+    } else {
+      console.error("Failed to fetch achievements.");
+    }
+  };
+
   // Fetch data everytime the page is focused? TODO: check if useEffect is needed
   useFocusEffect(
     useCallback(() => {
       fetchRarityCounts();
+      fetchAchievements();
     }, [])
   );
 
@@ -116,19 +133,40 @@ export default function ChallengesScreen() {
       {/* Render the 'Not Listed' count separately */}
       <View style={styles.notListedBox}>
         <Text style={styles.rarityText}>
-          Not Listed in IUCN Red List: {notListedCount} {" "}
+          Not Listed in IUCN Red List: {notListedCount}{" "}
           {/* Information for IUCN with the info button for Modal */}
           <Icon
             name="information-circle-outline"
             size={24}
             onPress={handleOpenInfoModal}
           />
-          
         </Text>
         <RarityInfoModal
-            visible={infoModalVisible}
-            onClose={() => setInfoModalVisible(false)}
-          />
+          visible={infoModalVisible}
+          onClose={() => setInfoModalVisible(false)}
+        />
+      </View>
+
+      {/* Achievements */}
+      <Text style={styles.headerText}>Your Achievements</Text>
+      <View style={styles.achievementsContainer}>
+        {achievements &&
+          Object.entries(achievements).map(([key, value]) => (
+            <View
+              style={[
+                styles.achievementItem,
+                { backgroundColor: value ? "#green" : "#gray" },
+              ]}
+              key={key}
+            >
+              <Text style={styles.achievementText}>
+                {/* Replacing _ with space and capitalizing first letter */}
+                {key
+                  .replace(/_/g, " ")
+                  .replace(/\b\w/g, (l) => l.toUpperCase())}
+              </Text>
+            </View>
+          ))}
       </View>
     </View>
   );
@@ -166,7 +204,7 @@ const styles = StyleSheet.create({
   rarityText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "black", 
+    color: "black",
   },
   rarityCount: {
     fontSize: 18,
@@ -180,9 +218,31 @@ const styles = StyleSheet.create({
     padding: 3,
     marginTop: 5,
     alignItems: "center",
-    backgroundColor: "#ffffff", 
+    backgroundColor: "#ffffff",
   },
 
   // Styles for achievements
-
+  headerText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    margin: 10,
+  },
+  achievementsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-around",
+    padding: 10,
+  },
+  achievementItem: {
+    width: "45%",  
+    padding: 10,
+    margin: 5,
+    alignItems: "center",
+    borderRadius: 5,
+  },
+  achievementText: {
+    textAlign: "center",
+    color: "#fff",
+  },
 });

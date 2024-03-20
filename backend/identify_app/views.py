@@ -74,6 +74,8 @@ def register(request):
         email: str = data.get('email')
         username: str = data.get('username')
         password: str = data.get('password')
+        first_name = data.get('first_name')
+        last_name = data.get('last_name')
 
         if User.objects.filter(username=username).exists():
             print("User already exists!")
@@ -81,7 +83,11 @@ def register(request):
 
         # if User.objects.filter(email=email).exists(): # can add this check if required
         hashed_password = make_password(password)
-        user = User.objects.create(username=username, email=email, password=hashed_password)
+        user = User.objects.create(username=username, email=email, password=hashed_password, 
+                                   first_name=first_name,last_name=last_name)
+        
+        Achievement.objects.create(user=user)
+
         identicon = generator.generate(username, 200, 200,
                                padding=padding, inverted=True, output_format="png")
         identicon_file = ContentFile(identicon, name=f"{user.username}_identicon.png")
@@ -379,6 +385,32 @@ def get_user_plant_counts(request, username):
         return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
+# Challenges Section view endpoints
+def get_user_achievements(request, username):
+    if request.method == 'GET':
+        try:
+            user = User.objects.get(username=username)
+            achievements = Achievement.objects.get(user=user)
+
+            achievements_data = {
+                "first_identification": achievements.first_identification,
+                "five_identifications": achievements.five_identifications,
+                "first_least_concern": achievements.first_least_concern,
+                "first_near_threatened": achievements.first_near_threatened,
+                "first_vulnerable": achievements.first_vulnerable,
+                "first_endangered": achievements.first_endangered,
+                "first_critical": achievements.first_critical,
+                "xp_at_1000_or_more": achievements.xp_at_1000_or_more,
+            }
+
+            return JsonResponse(achievements_data)
+    
+        except User.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
 # View functions for predictions
 
 
@@ -524,7 +556,7 @@ def update_achievements(user):
         achievements.first_least_concern = True
         achievements.save()
         achievement_messages.append("First 'Least Concern' Plant Identified!") 
-    if not achievements.first_near_threatened and user.plants.filter(rarity='LC').exists():
+    if not achievements.first_near_threatened and user.plants.filter(rarity='NT').exists():
         achievements.first_near_threatened = True
         achievements.save()
         achievement_messages.append("First 'Near Threatened' Plant Identified!") 

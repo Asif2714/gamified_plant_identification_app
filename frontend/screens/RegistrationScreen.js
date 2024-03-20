@@ -12,6 +12,8 @@ const RegistrationScreen = ({ onRegistrationComplete }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState(''); 
+  const [lastName, setLastName] = useState('');
 
   const handleRegistration = async () => {
         if (password !== confirmPassword) {
@@ -24,6 +26,8 @@ const RegistrationScreen = ({ onRegistrationComplete }) => {
           email: email,
           username: username,
           password: password,
+          first_name: firstName,
+          last_name: lastName,
         };
 
         try {
@@ -70,6 +74,18 @@ const RegistrationScreen = ({ onRegistrationComplete }) => {
         placeholder="Username"
         value={username}
         onChangeText={setUsername}
+      />
+        <TextInput
+        style={styles.input}
+        placeholder="First Name"
+        value={firstName}
+        onChangeText={setFirstName}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Last Name"
+        value={lastName}
+        onChangeText={setLastName}
       />
       <TextInput
         style={styles.input}
