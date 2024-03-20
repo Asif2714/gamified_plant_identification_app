@@ -13,7 +13,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib import auth
 from rest_framework.authtoken.models import Token
 from django.core.files.storage import default_storage
-from .models import Plant
+from .models import Plant, Achievement
 from datetime import datetime
 import logging
 logger = logging.getLogger(__name__)
@@ -230,11 +230,18 @@ def save_plant_details(request):
 
             plant.image.save(filename, image_file, save=True)
 
+            # Call the achievement checker and get updates if any
+            achievements_updates = update_achievements(user)
+        
+            if not isinstance(achievements_updates, list):
+                achievements_updates = [achievements_updates]
+
             # Return a success response
             return JsonResponse({
                 'success': 'Plant details saved successfully!',
                 'final_score_increased': final_score_increment,
-                'total_experience_points': user.experience_points 
+                'total_experience_points': user.experience_points,
+                'achievements_updates' : achievements_updates
             }, status=200)
 
         except User.DoesNotExist:
@@ -493,4 +500,53 @@ def preprocess_img(image):
     input_batch = input_tensor.unsqueeze(0)
     return input_batch
 
+
+def update_achievements(user):
+    achievements, created = Achievement.objects.get_or_create(user=user)
+
+    # The return string 
+    achievement_messages = []
+
+    # TODO: Info: add more points for getting any achievements
+
+    #Identification count achievements
+    if not achievements.first_identification and user.plants.count() >= 1:
+        achievements.first_identification = True
+        achievements.save()
+        achievement_messages.append("First Plant Identified!") 
+    if not achievements.five_identifications and user.plants.count() >= 5:
+        achievements.five_identifications = True
+        achievements.save()
+        achievement_messages.append("Five Plants Identified!") 
+
+    # Achievements for plant rarity
+    if not achievements.first_least_concern and user.plants.filter(rarity='LC').exists():
+        achievements.first_least_concern = True
+        achievements.save()
+        achievement_messages.append("First 'Least Concern' Plant Identified!") 
+    if not achievements.first_near_threatened and user.plants.filter(rarity='LC').exists():
+        achievements.first_near_threatened = True
+        achievements.save()
+        achievement_messages.append("First 'Near Threatened' Plant Identified!") 
+    if not achievements.first_vulnerable and user.plants.filter(rarity='VU').exists():
+        achievements.first_vulnerable = True
+        achievements.save()
+        achievement_messages.append("First 'Vulnerable' Plant Identified!") 
+    if not achievements.first_endangered and user.plants.filter(rarity='EN').exists():
+        achievements.first_endangered = True
+        achievements.save()
+        achievement_messages.append("First 'Endangered' Plant Identified!") 
+    if not achievements.first_critical and user.plants.filter(rarity='CR').exists():
+        achievements.first_critical = True
+        achievements.save()
+        achievement_messages.append("First 'Critically Endangered' Plant Identified!") 
+
+    # XP Achievements
+    if not achievements.xp_at_1000_or_more and user.experience_points > 1000:
+        achievements.xp_at_1000_or_more = True
+        achievements.save()
+        achievement_messages.append("Total 1000 XP Achieved!")
+
+
+    return achievement_messages
 

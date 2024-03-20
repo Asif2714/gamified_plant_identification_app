@@ -129,7 +129,12 @@ export default function TakeImageScreen() {
       let responseJson = await response.json();
       console.log(responseJson)
 
-      const formattedResponse = `The plant has been saved successfully.\nYour achieved score: ${responseJson.final_score_increased}\nYour Total Score: ${responseJson.total_experience_points}`;
+      let achievementsMessage = '';
+      if (responseJson.achievements_updates.length > 0) {
+        achievementsMessage = `New Achievements Unlocked: ${responseJson.achievements_updates.join(', ')}`;
+      }
+
+        const formattedResponse = `The plant has been saved successfully.\nYour achieved score: ${responseJson.final_score_increased}\nYour Total Score: ${responseJson.total_experience_points}${achievementsMessage}`;
 
 
       if (response.ok) {
