@@ -13,7 +13,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib import auth
 from rest_framework.authtoken.models import Token
 from django.core.files.storage import default_storage
-from .models import Plant
+from .models import Plant, Achievement
 from datetime import datetime
 import logging
 logger = logging.getLogger(__name__)
@@ -31,8 +31,7 @@ import base64
 from io import BytesIO
 from django.utils import timezone
 from django.core.serializers import serialize
-from django.db.models import F
-
+from django.db.models import F, Count
 import random
 
 
@@ -75,6 +74,8 @@ def register(request):
         email: str = data.get('email')
         username: str = data.get('username')
         password: str = data.get('password')
+        first_name = data.get('first_name')
+        last_name = data.get('last_name')
 
         if User.objects.filter(username=username).exists():
             print("User already exists!")
@@ -82,7 +83,11 @@ def register(request):
 
         # if User.objects.filter(email=email).exists(): # can add this check if required
         hashed_password = make_password(password)
-        user = User.objects.create(username=username, email=email, password=hashed_password)
+        user = User.objects.create(username=username, email=email, password=hashed_password, 
+                                   first_name=first_name,last_name=last_name)
+        
+        Achievement.objects.create(user=user)
+
         identicon = generator.generate(username, 200, 200,
                                padding=padding, inverted=True, output_format="png")
         identicon_file = ContentFile(identicon, name=f"{user.username}_identicon.png")
@@ -169,6 +174,15 @@ def get_user_details(request):
 
 # View functions for relevant plant details
 
+CONSERVATION_STATUS_SCORES = {
+    "CR": 500, # Critically Endangered
+    "EN": 300, # Endangered
+    "VU": 250, # Vulnerable
+    "NT": 200, # Near Threatened
+    "LC": 150, # Least Concerned
+    "Not Listed": 100 # The baseline score
+}
+
 @csrf_exempt
 def save_plant_details(request):
     print("attempting to save plant details")
@@ -180,7 +194,9 @@ def save_plant_details(request):
             print("got username!")
             scientific_name = request.POST.get('scientific_name')
             common_name = request.POST.get('common_name')
+            conservation_status = request.POST.get('conservation_status')
             gps_coordinates = request.POST.get('gps_coordinates')
+            confidence = float(request.POST.get('confidence'))
             image_file = request.FILES.get('file')
 
             filename = f"{user}_{scientific_name}.{image_file.name.split('.')[-1]}"
@@ -190,26 +206,49 @@ def save_plant_details(request):
                 user=user,
                 scientific_name=scientific_name,
                 common_name=common_name,
+                rarity= conservation_status,
                 gps_coordinates=gps_coordinates,
                 image=image_file,
                 date_time_taken=timezone.now()
             )
-            # Increasing player score, TODO: Include more variables such as confidence and rarity
+            # Baseline score baesd on Conservation status / rarity
+            score_increase = CONSERVATION_STATUS_SCORES.get(conservation_status, 100)
+
+            # Multiplier based on confidence
+            multiplier = 0
+            if 0.0 <= confidence <= 0.3:
+                multiplier = 0.3
+            elif 0.31 <= confidence <= 0.5:
+                multiplier = 0.5
+            elif 0.51 <= confidence <= 0.75:
+                multiplier = 0.75
+            else: 
+                multiplier = 1.0
+
+            final_score_increment = score_increase * multiplier
 
             # multiplier = getConfidenceMultiplier(request.POST.get('confidence'))
             print("USer xp before", user.experience_points)
-            user.experience_points = F('experience_points') + 100
+            user.experience_points = F('experience_points') + final_score_increment
             user.save()
+            user.refresh_from_db()
             print("USer xp after", user.experience_points)
 
             plant.image.save(filename, image_file, save=True)
 
-            
-            
-
+            # Call the achievement checker and get updates if any
+            achievements_updates = update_achievements(user)
+        
+            if not isinstance(achievements_updates, list):
+                achievements_updates = [achievements_updates]
 
             # Return a success response
-            return JsonResponse({'success': 'Plant details saved successfully.'}, status=200)
+            return JsonResponse({
+                'success': 'Plant details saved successfully!',
+                'final_score_increased': final_score_increment,
+                'total_experience_points': user.experience_points,
+                'achievements_updates' : achievements_updates
+            }, status=200)
 
         except User.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
@@ -242,14 +281,6 @@ def get_user_plant_with_details(request, username):
         user = User.objects.get(username=username)
         plants = Plant.objects.filter(user=user)
         serialized_plants_data = serialize("json", plants)
-        # plants_data = {
-        #             # 'user': plants.user,
-        #             'scientific_name': plants.scientific_name,
-        #             'common_name': plants.common_name,
-        #             'date_time_taken': plants.date_time_taken,
-        #             'gps_coordinates': plants.gps_coordinates,
-        #             'image': plants.image.url if plants.image else None,
-        #         }
         return JsonResponse({'plants_data': serialized_plants_data})
     else:
         # Only allow GET requests
@@ -312,6 +343,73 @@ def get_plants_for_homepage(request):
     
     else:
         return JsonResponse({'error':  'Invalid request method'}, status=400)
+
+'''
+CR -> Critically Endangered
+EN -> Endangered
+VU -> Vulnerable
+NT -> Near Threatened
+LC -> Least Concerned
+Not Listed
+'''
+
+@csrf_exempt
+def get_user_plant_counts(request, username):
+    if request.method == 'GET':
+        try:
+            RARITY= ['CR', 'EN', 'VU', 'NT', 'LC', 'Not Listed']
+            rarity_counts  = {rarity: 0 for rarity in RARITY}
+
+            user = User.objects.get(username = username)
+
+            # Count the plants by grouping them based on rarity
+            plants = Plant.objects.filter(user=user)
+            counts  = plants.values('rarity').annotate(count = Count('id')).order_by('rarity')
+
+            # Populating the rarity_counts array
+            for count in counts:
+                # Getting the Key from the data
+                rarity = count['rarity']
+                
+                # Setting the value
+                rarity_counts[rarity] = count['count']
+
+            # Restructure the response
+            formatted_counts = [{"rarity": rarity, "count": count} for rarity, count in rarity_counts.items()]
+
+            return JsonResponse({"rarity_counts": formatted_counts})
+    
+        except User.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+# Challenges Section view endpoints
+def get_user_achievements(request, username):
+    if request.method == 'GET':
+        try:
+            user = User.objects.get(username=username)
+            achievements = Achievement.objects.get(user=user)
+
+            achievements_data = {
+                "first_identification": achievements.first_identification,
+                "five_identifications": achievements.five_identifications,
+                "first_least_concern": achievements.first_least_concern,
+                "first_near_threatened": achievements.first_near_threatened,
+                "first_vulnerable": achievements.first_vulnerable,
+                "first_endangered": achievements.first_endangered,
+                "first_critical": achievements.first_critical,
+                "xp_at_1000_or_more": achievements.xp_at_1000_or_more,
+            }
+
+            return JsonResponse(achievements_data)
+    
+        except User.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 # View functions for predictions
 
@@ -403,8 +501,9 @@ def predict_image(request):
                     if predicted_class_string in ordered_species_json:
                         classification = ordered_species_json[predicted_class_string]['plant_name']
                         common_name = ordered_species_json[predicted_class_string]['common_name']
+                        conservation_status = ordered_species_json[predicted_class_string]['conservation_status']
                         print("Successful")
-                        return JsonResponse({'scientific_name': classification, 'common_name': common_name, 'confidence': confidence.item()})
+                        return JsonResponse({'scientific_name': classification, 'common_name': common_name, 'conservation_status': conservation_status, 'confidence': confidence.item()})
                     else:
                         print("")
                         return JsonResponse({'error': 'Predicted class not in JSON'})
@@ -414,6 +513,7 @@ def predict_image(request):
             return JsonResponse({'error': str(e)}, status=500) #TODO: check,and change to suitable code
  
     return JsonResponse({'error': 'Invalid request method'}, status=400)  #TODO: check if 400 is correct one for this
+
 
 
 
@@ -432,4 +532,53 @@ def preprocess_img(image):
     input_batch = input_tensor.unsqueeze(0)
     return input_batch
 
+
+def update_achievements(user):
+    achievements, created = Achievement.objects.get_or_create(user=user)
+
+    # The return string 
+    achievement_messages = []
+
+    # TODO: Info: add more points for getting any achievements
+
+    #Identification count achievements
+    if not achievements.first_identification and user.plants.count() >= 1:
+        achievements.first_identification = True
+        achievements.save()
+        achievement_messages.append("First Plant Identified!") 
+    if not achievements.five_identifications and user.plants.count() >= 5:
+        achievements.five_identifications = True
+        achievements.save()
+        achievement_messages.append("Five Plants Identified!") 
+
+    # Achievements for plant rarity
+    if not achievements.first_least_concern and user.plants.filter(rarity='LC').exists():
+        achievements.first_least_concern = True
+        achievements.save()
+        achievement_messages.append("First 'Least Concern' Plant Identified!") 
+    if not achievements.first_near_threatened and user.plants.filter(rarity='NT').exists():
+        achievements.first_near_threatened = True
+        achievements.save()
+        achievement_messages.append("First 'Near Threatened' Plant Identified!") 
+    if not achievements.first_vulnerable and user.plants.filter(rarity='VU').exists():
+        achievements.first_vulnerable = True
+        achievements.save()
+        achievement_messages.append("First 'Vulnerable' Plant Identified!") 
+    if not achievements.first_endangered and user.plants.filter(rarity='EN').exists():
+        achievements.first_endangered = True
+        achievements.save()
+        achievement_messages.append("First 'Endangered' Plant Identified!") 
+    if not achievements.first_critical and user.plants.filter(rarity='CR').exists():
+        achievements.first_critical = True
+        achievements.save()
+        achievement_messages.append("First 'Critically Endangered' Plant Identified!") 
+
+    # XP Achievements
+    if not achievements.xp_at_1000_or_more and user.experience_points > 1000:
+        achievements.xp_at_1000_or_more = True
+        achievements.save()
+        achievement_messages.append("Total 1000 XP Achieved!")
+
+
+    return achievement_messages
 

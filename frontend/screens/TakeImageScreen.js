@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Button, Image, Alert, StyleSheet, Text } from "react-native";
+import { View, Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 
@@ -8,6 +8,9 @@ import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from 'expo-location';
 
+import { Ionicons } from "@expo/vector-icons";
+
+
 
 const ipAddress = "10.0.2.2";
 
@@ -15,7 +18,7 @@ export default function TakeImageScreen() {
   const [imageIdentified, setImage] = useState(null);
   const [imageDetails, setImageDetails] = useState(null);
 
-  const pickImageAndSend = async () => {
+  const pickImageFromGallery = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -52,7 +55,7 @@ export default function TakeImageScreen() {
         console.log(imageDetails)
         console.log("Image details! done")
 
-        const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence}`;
+        const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence} \nConservation Status (Rarity): ${responseJson.conservation_status}`;
 
         
         Alert.alert('Identification Results', formattedResponse, [
@@ -67,6 +70,11 @@ export default function TakeImageScreen() {
         );
       }
     }
+  };
+
+  const takeImageWithCamera = () => {
+    // Placeholder function for taking an image with the phone camera
+    Alert.alert("Feature Coming Soon", "This feature is not implemented yet.");
   };
 
   const showSaveConfirmation = (image, details) => {
@@ -111,6 +119,7 @@ export default function TakeImageScreen() {
     });
     formData.append('scientific_name', details.scientific_name);
     formData.append('common_name', details.common_name);
+    formData.append('conservation_status', details.conservation_status);
     formData.append('gps_coordinates', gpsCoordinates);
     formData.append('username', username);
     formData.append('confidence', details.confidence)
@@ -125,8 +134,19 @@ export default function TakeImageScreen() {
         body: formData,
       });
 
+      let responseJson = await response.json();
+      console.log(responseJson)
+
+      let achievementsMessage = '';
+      if (responseJson.achievements_updates.length > 0) {
+        achievementsMessage = `New Achievements Unlocked: ${responseJson.achievements_updates.join(', ')}`;
+      }
+
+        const formattedResponse = `The plant has been saved successfully.\nYour achieved score: ${responseJson.final_score_increased}\nYour Total Score: ${responseJson.total_experience_points}${achievementsMessage}`;
+
+
       if (response.ok) {
-        Alert.alert('Success', 'The plant has been saved successfully.');
+        Alert.alert('Save Succesful!', formattedResponse);
       } else {
         Alert.alert('Error', 'Could not save the plant details.');
       }
@@ -157,19 +177,52 @@ export default function TakeImageScreen() {
 
 
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      {/* <Button title='upload' onPress={openGallery}></Button> */}
-      <Button title="Pick an Image from Gallery" onPress={pickImageAndSend} />
-      <Button title="Test Server Connection" onPress={testServerConnection} />
+    <View style={styles.container}>
+    <View style={styles.optionContainer}>
+      <TouchableOpacity style={styles.optionButton} onPress={pickImageFromGallery}>
+        <Ionicons name="images-outline" size={50} color="black" />
+        <Text style={styles.optionText}>Pick Image from Gallery</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.optionButton} onPress={takeImageWithCamera}>
+        <Ionicons name="camera-outline" size={50} color="black" />
+        <Text style={styles.optionText}>Take Image with Camera</Text>
+      </TouchableOpacity>
     </View>
+
+    <TouchableOpacity style={styles.testServerButton} onPress={testServerConnection}>
+      <Text style={styles.testServerText}>Test Server Connection</Text>
+    </TouchableOpacity>
+  </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-around",
+    backgroundColor: "#white",
+  },
+  optionContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+  },
+  optionButton: {
+    alignItems: "center",
+    padding: 10,
+  },
+  optionText: {
+    marginTop: 5,
+    textAlign: "center",
+  },
+  testServerButton: {
+    padding: 10,
+    backgroundColor: "#gray",
+    borderRadius: 5,
+  },
+  testServerText: {
+    color: "#white",
   },
 });

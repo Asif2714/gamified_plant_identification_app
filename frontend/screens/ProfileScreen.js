@@ -123,11 +123,22 @@ export default function ProfileScreen(props) {
   };
 
   const getMarkerColor = (rarity) => {
+    console.log("Rarity: ",rarity)
     switch (rarity) {
-      case 'None':
-        return 'gray';
+      case "CR":
+        return "#EA5448";
+      case "EN":
+        return "#DA891C";
+      case "VU":
+        return "#FFC476";
+      case "NT":
+        return "#1A5B8C";
+      case "LC":
+        return "#5586AC";
+      case "Not Listed":
+        return "#7F7F7F";
       default:
-        return 'blue';
+        return "blue";
     }
   };
 
