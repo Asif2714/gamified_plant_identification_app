@@ -44,6 +44,7 @@ https://medium.com/yavar/how-to-use-the-reduce-in-javascript-and-react-4bc8b5f8f
 https://docs.djangoproject.com/en/5.0/topics/db/examples/one_to_one/ -> OneToOne for User-Achievemnt models
 https://www.queworx.com/django/django-get_or_create/ -> For creating new unique Achievemtns for each user 
 https://docs.djangoproject.com/en/5.0/ref/contrib/admin/#django.contrib.admin.StackedInline -> stackedInline for showing achievements in User page in django admin
+https://docs.expo.dev/versions/latest/sdk/imagepicker/ -> Launch camera + original for launch gallery
 
 
 Tutorials:

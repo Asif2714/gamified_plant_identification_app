@@ -18,6 +18,43 @@ export default function TakeImageScreen() {
   const [imageIdentified, setImage] = useState(null);
   const [imageDetails, setImageDetails] = useState(null);
 
+  const processImage = async (image) => {
+    const formdata = new FormData();
+    
+    formdata.append("file", {
+      uri: image.uri,
+      type: image.mimeType || "image/jpeg",
+      name: image.fileName || "uploaded_image.jpg",
+    });
+  
+    try {
+      let response = await fetch(`${CONFIG.API_URL}/predict/`, {
+        method: "POST",
+        body: formdata,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+  
+      let responseJson = await response.json();
+      console.log(responseJson, "responseJson");
+      setImageDetails(responseJson); // Save the details for later use
+  
+      const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence}\nConservation Status (Rarity): ${responseJson.conservation_status}`;
+  
+      Alert.alert('Identification Results', formattedResponse, [
+        { text: 'OK', onPress: () => showSaveConfirmation(image, responseJson) }
+      ]);
+  
+    } catch (error) {
+      console.error(error);
+      Alert.alert(
+        "Server Connection Error",
+        "Could not connect to the server."
+      );
+    }
+  };
+  
   const pickImageFromGallery = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -25,56 +62,24 @@ export default function TakeImageScreen() {
       aspect: [4, 3],
       quality: 1,
     });
-
+  
     if (!result.canceled) {
       setImage(result.assets[0]);  // Save image for later use
-
-      const formdata = new FormData();
-
-      const image = result.assets[0];
-      
-      formdata.append("file", {
-        uri: image.uri,
-        type: image.mimeType || "image/jpeg",
-        name: image.fileName || "uploaded_image.jpg",
-      });
-
-      try {
-        let response = await fetch(`${CONFIG.API_URL}/predict/`, {
-          method: "POST",
-          body: formdata,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        let responseJson = await response.json();
-        console.log(responseJson, "responseJson");
-        setImageDetails(responseJson); // Save the details for later use
-        console.log("Image details!")
-        console.log(imageDetails)
-        console.log("Image details! done")
-
-        const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence} \nConservation Status (Rarity): ${responseJson.conservation_status}`;
-
-        
-        Alert.alert('Identification Results', formattedResponse, [
-          { text: 'OK', onPress: () => showSaveConfirmation(image, responseJson) }
-        ]);
-
-      } catch (error) {
-        console.error(error);
-        Alert.alert(
-          "Server Connection Error",
-          "Could not connect to the server."
-        );
-      }
+      await processImage(result.assets[0]);
     }
   };
-
-  const takeImageWithCamera = () => {
-    // Placeholder function for taking an image with the phone camera
-    Alert.alert("Feature Coming Soon", "This feature is not implemented yet.");
+  
+  const takeImageWithCamera = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+  
+    if (!result.canceled) {
+      setImage(result.assets[0]); 
+      await processImage(result.assets[0]);
+    }
   };
 
   const showSaveConfirmation = (image, details) => {
