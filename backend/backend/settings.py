@@ -143,7 +143,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 #     "http://localhost:8081",
 # ]
 
-ALLOWED_HOSTS = ['10.0.2.2','127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['10.0.2.2','127.0.0.1', 'localhost', '192.168.1.213']
 
 AUTH_USER_MODEL = 'identify_app.User'
 

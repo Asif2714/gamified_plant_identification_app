@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, Image, Dimensions } from "react-native";
 import React from "react";
 import moment from "moment"; // for date conversion
+import CONFIG from '../app_config';
 
 
 const{width, height} = Dimensions.get('screen');
@@ -10,12 +11,12 @@ export default function SlideItem({ item }) {
     return moment(dateString).format("Do MMMM YYYY");
   };
 
-  console.log(`http://10.0.2.2:8000/media/${item.image}`);
+  console.log(`${CONFIG.API_URL}/media/${item.image}`);
   return (
     <View style={styles.container}>
       <Image
         //TODO: shift to amazon s3, or update this url later to not have emulator ip.
-        source={{ uri: `http://10.0.2.2:8000/media/${item.image}` }}
+        source={{ uri: `${CONFIG.API_URL}/media/${item.image}` }}
         style={styles.image}
         resizeMode="contain"
         onError={(e) => console.log(e.nativeEvent.error)}

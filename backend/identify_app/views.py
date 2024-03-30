@@ -153,10 +153,13 @@ def get_user_details(request):
         if username:
             try:
                 user = User.objects.get(username=username)  
+
+                profile_name = user.profile_name if user.profile_name else f"{user.first_name} {user.last_name}".strip()
+
                 user_data = {
                     'username': user.username,
                     'email': user.email,
-                    'profile_name': getattr(user, 'profile_name', 'Profile Name is not set'),
+                    'profile_name': profile_name,
                     'profile_picture': user.profile_picture.url if user.profile_picture else None,
                     'experience_points': getattr(user, 'experience_points', 0),
                 }

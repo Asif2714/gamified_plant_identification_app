@@ -235,7 +235,7 @@ export default function ProfileScreen(props) {
             <Image
               source={{
                 uri:
-                  `http://10.0.2.2:8000${user.profile_picture}` ||
+                  `${CONFIG.API_URL}${user.profile_picture}` ||
                   "default_image_placeholder_TODO",
               }}
               style={styles.profileImage}

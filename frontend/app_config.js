@@ -1,8 +1,12 @@
-const IP_ADDRESS = `10.0.2.2`;
+const USE_LOCAL_IP = true;
+const LOCAL_IP_ADDRESS = '192.168.1.213'; 
+const EMULATOR_IP_ADDRESS = '10.0.2.2';
+
+const IP_ADDRESS = USE_LOCAL_IP ? LOCAL_IP_ADDRESS : EMULATOR_IP_ADDRESS;
 
 const CONFIG = {
     IP_ADDRESS,
     API_URL: `http://${IP_ADDRESS}:8000`,
 };
   
-  export default CONFIG;
+export default CONFIG;
