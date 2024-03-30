@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const ipAddress = '10.0.2.2';
+import CONFIG from '../app_config';
 
 const RegistrationScreen = ({ onRegistrationComplete }) => {
   const navigation = useNavigation();
@@ -31,7 +31,7 @@ const RegistrationScreen = ({ onRegistrationComplete }) => {
         };
 
         try {
-          const response = await fetch(`http://${ipAddress}:8000/register/`, {
+          const response = await fetch(`${CONFIG.API_URL}/register/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

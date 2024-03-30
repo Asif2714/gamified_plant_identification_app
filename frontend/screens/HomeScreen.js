@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList, Image } from "react-native";
 import moment from "moment";
+import CONFIG from '../app_config';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function HomeScreen() {
   const [content, setContent] = useState([]);
-  const ipAddress = "10.0.2.2";
+  
 
   useEffect(() => {
     fetchContent();
@@ -13,12 +15,18 @@ export default function HomeScreen() {
   const fetchContent = async () => {
     // Fetching 10 recent user images (a bit randomized!)
     const response = await fetch(
-      `http://${ipAddress}:8000/plants-for-homepage/`
+      `${CONFIG.API_URL}/plants-for-homepage/`
     );
     const data = await response.json();
     // TODO: Fetch plant facts or nature news, and add their "type"
     setContent(data);
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchContent();
+    }, [])
+  );
 
   const renderItem = ({ item }) => {
     switch (item.type) {
@@ -28,7 +36,7 @@ export default function HomeScreen() {
           <View style={styles.card}>
             <Image
               source={{
-                uri: `http://${ipAddress}:8000${item.plant_image}`,
+                uri: `${CONFIG.API_URL}${item.plant_image}`,
               }}
               style={styles.image}
             />
@@ -36,7 +44,7 @@ export default function HomeScreen() {
               <View style={styles.userContainer}>
                 <Image
                   source={{
-                    uri: `http://${ipAddress}:8000${item.user_profile_picture}`,
+                    uri: `${CONFIG.API_URL}${item.user_profile_picture}`,
                   }}
                   style={styles.profilePic}
                 />

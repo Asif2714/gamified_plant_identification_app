@@ -9,10 +9,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from 'expo-location';
 
 import { Ionicons } from "@expo/vector-icons";
+import CONFIG from '../app_config';
 
 
 
-const ipAddress = "10.0.2.2";
 
 export default function TakeImageScreen() {
   const [imageIdentified, setImage] = useState(null);
@@ -40,7 +40,7 @@ export default function TakeImageScreen() {
       });
 
       try {
-        let response = await fetch(`http://${ipAddress}:8000/predict/`, {
+        let response = await fetch(`${CONFIG.API_URL}/predict/`, {
           method: "POST",
           body: formdata,
           headers: {
@@ -105,9 +105,16 @@ export default function TakeImageScreen() {
       Alert.alert('Permission Denied', 'Need access to location to store image');
       return;
     }
-
-    const location = await Location.getCurrentPositionAsync({});
+    console.log("Getting location:")
+    const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Highest,
+        maximumAge: 10000,
+        timeout: 5000
+      });
+    console.log(`Location found: ${location}`);
     const gpsCoordinates = `${location.coords.latitude},${location.coords.longitude}`;
+
+    console.log(gpsCoordinates)
 
     //TODO: create a view function to check if the plant picture is already saved
 
@@ -125,7 +132,7 @@ export default function TakeImageScreen() {
     formData.append('confidence', details.confidence)
 
     try {
-      const response = await fetch(`http://${ipAddress}:8000/save-plant-details/`, {
+      const response = await fetch(`${CONFIG.API_URL}/save-plant-details/`, {
         method: 'POST',
         headers: {
           // 'Authorization': `Token ${userToken}`,
@@ -160,7 +167,7 @@ export default function TakeImageScreen() {
 
   const testServerConnection = async () => {
     try {
-      const response = await fetch(`http://${ipAddress}:8000/test-get/`);
+      const response = await fetch(`${CONFIG.API_URL}/test-get/`);
       const json = await response.json();
       Alert.alert("Server Response", JSON.stringify(json));
     } catch (error) {
@@ -202,7 +209,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "space-around",
-    backgroundColor: "#white",
+    backgroundColor: "#fff",
   },
   optionContainer: {
     flexDirection: "row",
@@ -219,10 +226,10 @@ const styles = StyleSheet.create({
   },
   testServerButton: {
     padding: 10,
-    backgroundColor: "#gray",
+    backgroundColor: "gray",
     borderRadius: 5,
   },
   testServerText: {
-    color: "#white",
+    color: "black",
   },
 });

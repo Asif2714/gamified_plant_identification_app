@@ -15,7 +15,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 
 import RarityInfoModal from "../modals/RarityInfoModal";
 
-const ipAddress = "10.0.2.2";
+import CONFIG from '../app_config';
 
 // Colors available at https://www.withoutnations.com/portfolio/iucn-red-list/
 const iucnColors = {
@@ -46,7 +46,7 @@ export default function ChallengesScreen() {
 
     if (username) {
       try {
-        request = `http://${ipAddress}:8000/get-user-plant-counts/${username}/`;
+        request = `${CONFIG.API_URL}/get-user-plant-counts/${username}/`;
         const response = await fetch(request, {
           method: "GET",
           headers: {
@@ -81,7 +81,7 @@ export default function ChallengesScreen() {
   const fetchAchievements = async () => {
     const username = await AsyncStorage.getItem("username");
     const response = await fetch(
-      `http://${ipAddress}:8000/get-user-achievements/${username}/`
+      `${CONFIG.API_URL}/get-user-achievements/${username}/`
     );
     if (response.ok) {
       const data = await response.json();
@@ -119,7 +119,7 @@ export default function ChallengesScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Rarity of your identified plants</Text>
+      <Text style={styles.headerTextRarity}>Rarity of your identified plants</Text>
       <View style={styles.rarityContainer}>
         {Object.entries(mainRarities).map(([key, value]) => (
           <RarityItem
@@ -147,15 +147,16 @@ export default function ChallengesScreen() {
         />
       </View>
 
+
       {/* Achievements */}
-      <Text style={styles.headerText}>Your Achievements</Text>
+      <Text style={styles.headerTextAchievements}>Your Achievements</Text>
       <View style={styles.achievementsContainer}>
         {achievements &&
           Object.entries(achievements).map(([key, value]) => (
             <View
               style={[
                 styles.achievementItem,
-                { backgroundColor: value ? "#green" : "#gray" },
+                { backgroundColor: value ? "green" : "gray" },
               ]}
               key={key}
             >
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
     padding: 7,
     backgroundColor: "#F6FBF4",
   },
-  headerText: {
+  headerTextRarity: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 1,
@@ -222,7 +223,7 @@ const styles = StyleSheet.create({
   },
 
   // Styles for achievements
-  headerText: {
+  headerTextAchievements: {
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",

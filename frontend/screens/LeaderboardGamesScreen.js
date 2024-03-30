@@ -2,8 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, StyleSheet, FlatList, Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
-
-const ipAddress = "10.0.2.2";
+import CONFIG from '../app_config';
 
 export default function LeaderboardGamesScreen() {
   const [leaderboardData, setLeaderboardData] = useState([]);
@@ -16,7 +15,7 @@ export default function LeaderboardGamesScreen() {
 
   const fetchLeaderboardData = async () => {
     try {
-      const response = await fetch(`http://${ipAddress}:8000/leaderboard`);
+      const response = await fetch(`${CONFIG.API_URL}/leaderboard`);
       const data = await response.json();
 
       if (response.ok) {
@@ -65,7 +64,7 @@ export default function LeaderboardGamesScreen() {
             <Image
               source={{
                 //TODO: AWS S3 Bucket changes in future
-                uri: `http://${ipAddress}:8000/${item.profile_picture}`,
+                uri: `${CONFIG.API_URL}/${item.profile_picture}`,
               }}
               style={styles.profilePic}
             />
