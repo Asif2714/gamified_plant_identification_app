@@ -51,19 +51,19 @@ export default function LeaderboardGamesScreen() {
 
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.heading}>Leaderboard</Text> */}
       {userPosition && (
-        <Text style={styles.position}>Your position: {userPosition}</Text>
+        <View style={styles.positionContainer}>
+          <Text style={styles.position}>Your position: {userPosition}</Text>
+        </View>
       )}
       <FlatList
         data={leaderboardData}
         keyExtractor={(item) => item.username}
         renderItem={({ item, index }) => (
-          <View style={styles.item}>
+          <View style={[styles.item, index === 0 && styles.firstItem]}>
             <Text style={styles.positionNumber}>{index + 1}.</Text>
             <Image
               source={{
-                //TODO: AWS S3 Bucket changes in future
                 uri: `${CONFIG.API_URL}/${item.profile_picture}`,
               }}
               style={styles.profilePic}
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#F6FBF4",
   },
   heading: {
     fontSize: 24,
@@ -92,13 +92,27 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 10,
   },
+  positionContainer: {
+    backgroundColor: "#195100",
+    borderRadius: 8,
+    padding: 6,
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  position: {
+    fontSize: 18,
+    color: "#ffffff",
+    fontWeight: "bold",
+  },
   item: {
     flexDirection: "row",
+    // alignItems: "center",
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
+    
   },
   profilePic: {
     width: 30,
@@ -109,13 +123,17 @@ const styles = StyleSheet.create({
   positionNumber: {
     fontSize: 16,
     marginRight: 6,
+    color: "#252900",
   },
   username: {
     flex: 1,
     fontSize: 16,
+    fontWeight: "bold",
+    color: "#252900",
     marginLeft: 10,
   },
   experience: {
     fontSize: 16,
+    color: "#252900",
   },
 });

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Alert} from 'react-native';
+import { View, TextInput, Button, StyleSheet, Alert, TouchableOpacity, Text} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CONFIG from '../app_config';
 
@@ -44,6 +44,7 @@ const SignInScreen = ({ onSignIn }) => {
 
   return (
     <View style={styles.container}>
+       <Text style={styles.appName}>Plant Explorer</Text>
       <TextInput
         style={styles.input}
         placeholder="Username"
@@ -57,26 +58,49 @@ const SignInScreen = ({ onSignIn }) => {
         value={password}
         onChangeText={setPassword}
       />
-      {/* TODO: implmeent sign in proper func after finishing registration, currently it's dummy sign */}
-      {/* <Button title="Sign In" onPress={handleSignIn} /> */}
-      <Button title="Sign In" onPress={handleSignIn} />
+      <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
+        <Text style={styles.signInButtonText}>Sign In</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 20,
-    padding: 10,
-  },
-});
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      padding: 20,
+      backgroundColor: "#F6FBF4",
+    },
+    appName: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: "#252900",
+      marginBottom: 40,
+      alignSelf: 'center',
+    },
+    input: {
+      height: 50,
+      borderRadius: 9,
+      padding: 15,
+      backgroundColor: "#ffffff",
+      borderColor: "#195100",
+      borderWidth: 1,
+      marginBottom: 15,
+    },
+    signInButton: {
+      height: 50,
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: "#195100",
+      marginTop: 20,
+    },
+    signInButtonText: {
+      color: "#ffffff",
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+  });
 
 export default SignInScreen;

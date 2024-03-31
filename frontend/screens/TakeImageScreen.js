@@ -190,51 +190,66 @@ export default function TakeImageScreen() {
 
   return (
     <View style={styles.container}>
-    <View style={styles.optionContainer}>
-      <TouchableOpacity style={styles.optionButton} onPress={pickImageFromGallery}>
-        <Ionicons name="images-outline" size={50} color="black" />
-        <Text style={styles.optionText}>Pick Image from Gallery</Text>
-      </TouchableOpacity>
+      <View style={styles.optionContainer}>
+        <TouchableOpacity style={[styles.optionButton, styles.optionButtonLeft]}  onPress={pickImageFromGallery}>
+          <Ionicons name="images-outline" size={50} color="#252900" />
+          <Text style={styles.optionText}>Pick Image from Gallery</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.optionButton} onPress={takeImageWithCamera}>
-        <Ionicons name="camera-outline" size={50} color="black" />
-        <Text style={styles.optionText}>Take Image with Camera</Text>
+        <TouchableOpacity style={styles.optionButton} onPress={takeImageWithCamera}>
+          <Ionicons name="camera-outline" size={50} color="#252900" />
+          <Text style={styles.optionText}>Take Image with Camera</Text>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity style={styles.testServerButton} onPress={testServerConnection}>
+        <Text style={styles.testServerText}>Test Server Connection</Text>
       </TouchableOpacity>
     </View>
-
-    <TouchableOpacity style={styles.testServerButton} onPress={testServerConnection}>
-      <Text style={styles.testServerText}>Test Server Connection</Text>
-    </TouchableOpacity>
-  </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "space-around",
-    backgroundColor: "#fff",
-  },
-  optionContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
-  },
-  optionButton: {
-    alignItems: "center",
-    padding: 10,
-  },
-  optionText: {
-    marginTop: 5,
-    textAlign: "center",
-  },
-  testServerButton: {
-    padding: 10,
-    backgroundColor: "gray",
-    borderRadius: 5,
-  },
-  testServerText: {
-    color: "black",
-  },
-});
+    container: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "#F6FBF4",
+    },
+    optionContainer: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      width: "95%",
+    },
+    optionButton: {
+        flex: 1, 
+        alignItems: "center",
+        padding: 20,
+        backgroundColor: "#fff",
+        borderColor: "#195100", 
+        borderWidth: 2,
+        borderRadius: 10,
+        margin: 10,
+        textAlign: "center"
+      },
+    optionButtonLeft: { 
+        marginRight: 5, 
+      },
+    optionText: {
+      marginTop: 10,
+      color: "#252900", 
+      fontWeight: "bold",
+    },
+    testServerButton: {
+      marginTop: 30,
+      padding: 15,
+      backgroundColor: "#fff", 
+      borderRadius: 20,
+      borderWidth: 2,
+      borderColor: "#195100"
+    },
+    testServerText: {
+      color: "black", 
+      fontWeight: "bold",
+    },
+  });

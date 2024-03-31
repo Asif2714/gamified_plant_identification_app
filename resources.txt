@@ -61,3 +61,4 @@ https://github.com/encode/django-rest-framework/issues/6808 -> RestFramework Cra
 Others
 https://github.com/ropensci/rredlist/issues/52 -> IUCN red list bypass
 public token (for non-commercial username): 9bb4facb6d23f48efbf424bb05c0c1ef1cf6f468393bc745d42179ac4aca5fee
+https://stackoverflow.com/questions/59628605/get-csrf-token-in-react-native -> CSRF Token not required for mobile only apps

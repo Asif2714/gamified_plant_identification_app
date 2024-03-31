@@ -282,7 +282,7 @@ def get_user_plants(request, username):
 def get_user_plant_with_details(request, username):
     if request.method == 'GET':
         user = User.objects.get(username=username)
-        plants = Plant.objects.filter(user=user)
+        plants = Plant.objects.filter(user=user).order_by('-date_time_taken')
         serialized_plants_data = serialize("json", plants)
         return JsonResponse({'plants_data': serialized_plants_data})
     else:
