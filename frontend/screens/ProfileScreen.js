@@ -18,8 +18,7 @@ import MapView, { Marker } from 'react-native-maps';
 // Importing components
 // import ProfilePlantCarousel from "../components/ProfilePlantCarousel";
 import Slider from "../components/Slider";
-
-const ipAddress = "10.0.2.2";
+import CONFIG from '../app_config';
 
 export default function ProfileScreen(props) {
   const { user, setUser, setUserToken, setUserId } = useContext(UserContext);
@@ -35,7 +34,7 @@ export default function ProfileScreen(props) {
     const username = await AsyncStorage.getItem("username");
     console.log(`fetching user details with username: ${username}`);
     try {
-      request = `http://${ipAddress}:8000/user-details/?username=${username}`;
+      request = `${CONFIG.API_URL}/user-details/?username=${username}`;
       const response = await fetch(request, {
         method: "GET",
         headers: {
@@ -66,7 +65,7 @@ export default function ProfileScreen(props) {
     const userToken = await AsyncStorage.getItem("userToken");
 
     try {
-      const response = await fetch(`http://${ipAddress}:8000/logout/`, {
+      const response = await fetch(`${CONFIG.API_URL}/logout/`, {
         method: "POST",
         headers: {
           // Authorization: `Token ${userToken}`,
@@ -101,7 +100,7 @@ export default function ProfileScreen(props) {
 
     try {
       const response = await fetch(
-        `http://${ipAddress}:8000/get-user-plants-with-details/${username}/`
+        `${CONFIG.API_URL}/get-user-plants-with-details/${username}/`
       );
       const json = await response.json();
 
@@ -123,11 +122,22 @@ export default function ProfileScreen(props) {
   };
 
   const getMarkerColor = (rarity) => {
+    console.log("Rarity: ",rarity)
     switch (rarity) {
-      case 'None':
-        return 'gray';
+      case "CR":
+        return "#EA5448";
+      case "EN":
+        return "#DA891C";
+      case "VU":
+        return "#FFC476";
+      case "NT":
+        return "#1A5B8C";
+      case "LC":
+        return "#5586AC";
+      case "Not Listed":
+        return "#7F7F7F";
       default:
-        return 'blue';
+        return "blue";
     }
   };
 
@@ -142,7 +152,7 @@ export default function ProfileScreen(props) {
       const [latitude, longitude] = plant.fields.gps_coordinates.split(',');
       console.log(latitude, longitude)
       const markerColor = getMarkerColor(plant.fields.rarity);
-      const imageUri = `http://${ipAddress}:8000${plant.fields.image}`; //TODO: add image to marker
+      const imageUri = `${CONFIG.API_URL}${plant.fields.image}`; //TODO: add image to marker
       return (
         <Marker
           key={index}
@@ -225,8 +235,8 @@ export default function ProfileScreen(props) {
             <Image
               source={{
                 uri:
-                  `http://10.0.2.2:8000${user.profile_picture}` ||
-                  "default_image_placeholder",
+                  `${CONFIG.API_URL}${user.profile_picture}` ||
+                  "default_image_placeholder_TODO",
               }}
               style={styles.profileImage}
               onError={(e) => console.log(e.nativeEvent.error)}

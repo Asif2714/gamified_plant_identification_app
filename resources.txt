@@ -14,8 +14,16 @@ Resources
 https://jdenticon.com/#icon-
 https://docs.djangoproject.com/en/5.0/topics/auth/customizing/#referencing-the-user-model -> using get_user_model for user
 https://pydenticon.readthedocs.io/en/0.3/usage.html -> pyidenticon instructions
+https://www.withoutnations.com/portfolio/iucn-red-list/ -> the redlist, IUCN color palette also here
 
-
+const iucnColors = {
+  CR: '#FF0000', // Red
+  EN: '#FFD300', // Yellow
+  VU: '#FFA500', // Orange
+  NT: '#2E8B57', // Green
+  LC: '#808080', // Grey
+  NL: '#9E9E9E', // Dark grey for Not Listed
+};
 
 Django and React/React native
 https://reactnavigation.org/docs/stack-navigator/
@@ -31,6 +39,12 @@ https://docs.djangoproject.com/en/2.0/ref/models/querysets/#update -> Django upd
 https://www.w3schools.com/django/django_queryset_orderby.php -> Djanog queryset orderby (for leaderboard system)
 https://www.npmjs.com/package/react-native-maps -> maps for plotting
 https://github.com/react-native-maps/react-native-maps/blob/master/docs/installation.md -> map setup
+https://stackoverflow.com/questions/4377861/reload-django-object-from-database -> .refresh_from_db() to get updated user score
+https://medium.com/yavar/how-to-use-the-reduce-in-javascript-and-react-4bc8b5f8fa4b -> .reduce() function for reassigning rarity values
+https://docs.djangoproject.com/en/5.0/topics/db/examples/one_to_one/ -> OneToOne for User-Achievemnt models
+https://www.queworx.com/django/django-get_or_create/ -> For creating new unique Achievemtns for each user 
+https://docs.djangoproject.com/en/5.0/ref/contrib/admin/#django.contrib.admin.StackedInline -> stackedInline for showing achievements in User page in django admin
+https://docs.expo.dev/versions/latest/sdk/imagepicker/ -> Launch camera + original for launch gallery
 
 
 Tutorials:
@@ -42,6 +56,7 @@ https://www.youtube.com/watch?v=2TgArwz6je8&t=352s -> RN custom carousel
 Issues:
 https://stackoverflow.com/questions/8381193/handle-json-decode-error-when-nothing-returned -> JsonDecodeErrors
 https://stackoverflow.com/questions/7497138/how-do-i-serialize-an-imagefield-in-django -> serializing imagefield
+https://github.com/encode/django-rest-framework/issues/6808 -> RestFramework Crashing issue
 
 Others
 https://github.com/ropensci/rredlist/issues/52 -> IUCN red list bypass
@@ -52,3 +67,4 @@ PyTorch resources:
 https://pytorch.org/vision/stable/transforms.html -> Transforms to change data
 https://stackoverflow.com/questions/62035811/in-pytorch-how-to-convert-the-cuda-related-codes-into-cpu-version -> Converting to CUDA
 https://discuss.pytorch.org/t/saving-and-loading-a-model-in-pytorch/2610 -> Saving and loading models in pytorch
+https://stackoverflow.com/questions/59628605/get-csrf-token-in-react-native -> CSRF Token not required for mobile only apps

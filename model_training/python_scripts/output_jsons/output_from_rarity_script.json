@@ -7,13 +7,13 @@
     },
     "1": {
         "plant_id": "1355920",
-        "plant_name": "Pelargonium capitatum (L.) L'Hér.",
+        "plant_name": "Pelargonium capitatum (L.) L'H\u00c3\u00a9r.",
         "common_name": "Rose scented geranium",
         "conservation_status": "Not Listed"
     },
     "2": {
         "plant_id": "1355932",
-        "plant_name": "Pelargonium graveolens L'Hér.",
+        "plant_name": "Pelargonium graveolens L'H\u00c3\u00a9r.",
         "common_name": "Sweet scented geranium",
         "conservation_status": "Not Listed"
     },
@@ -31,25 +31,25 @@
     },
     "5": {
         "plant_id": "1355955",
-        "plant_name": "Pelargonium odoratissimum (L.) L'Hér.",
+        "plant_name": "Pelargonium odoratissimum (L.) L'H\u00c3\u00a9r.",
         "common_name": "Apple geranium",
         "conservation_status": "Not Listed"
     },
     "6": {
         "plant_id": "1355959",
-        "plant_name": "Pelargonium peltatum (L.) L'Hér.",
+        "plant_name": "Pelargonium peltatum (L.) L'H\u00c3\u00a9r.",
         "common_name": "Ivyleaf geranium",
         "conservation_status": "Not Listed"
     },
     "7": {
         "plant_id": "1355961",
-        "plant_name": "Pelargonium quercifolium (L. f.) L'Hér.",
+        "plant_name": "Pelargonium quercifolium (L. f.) L'H\u00c3\u00a9r.",
         "common_name": "Oakleaf geranium",
         "conservation_status": "Not Listed"
     },
     "8": {
         "plant_id": "1355978",
-        "plant_name": "Pelargonium zonale (L.) L'Hér.",
+        "plant_name": "Pelargonium zonale (L.) L'H\u00c3\u00a9r.",
         "common_name": "Horseshoe geranium",
         "conservation_status": "Not Listed"
     },
@@ -1603,7 +1603,7 @@
     },
     "267": {
         "plant_id": "1367938",
-        "plant_name": "Acacia drepanolobium Harms ex Y. Sjöstedt",
+        "plant_name": "Acacia drepanolobium Harms ex Y. Sj\u00c3\u00b6stedt",
         "common_name": "Acacia-hedge",
         "conservation_status": "Not Listed"
     },
@@ -1681,7 +1681,7 @@
     },
     "280": {
         "plant_id": "1373151",
-        "plant_name": "Pelargonium alchemilloides (L.) L'Hér.",
+        "plant_name": "Pelargonium alchemilloides (L.) L'H\u00c3\u00a9r.",
         "common_name": "Night-scent pelargonium",
         "conservation_status": "Not Listed"
     },
@@ -1873,7 +1873,7 @@
     },
     "312": {
         "plant_id": "1384482",
-        "plant_name": "Cucurbita ficifolia Bouché",
+        "plant_name": "Cucurbita ficifolia Bouch\u00c3\u00a9",
         "common_name": "Figleaf gourd",
         "conservation_status": "Not Listed"
     },
@@ -2029,7 +2029,7 @@
     },
     "338": {
         "plant_id": "1389308",
-        "plant_name": "Sedum dendroideum Moc. & Sessé ex DC.",
+        "plant_name": "Sedum dendroideum Moc. & Sess\u00c3\u00a9 ex DC.",
         "common_name": "Tree stonecrop",
         "conservation_status": "Not Listed"
     },
@@ -2785,7 +2785,7 @@
     },
     "464": {
         "plant_id": "1394153",
-        "plant_name": "Ophrys morisii (Martelli) Soó",
+        "plant_name": "Ophrys morisii (Martelli) So\u00c3\u00b3",
         "common_name": "Bertoloni's ophrys",
         "conservation_status": "Not Listed"
     },
@@ -2797,7 +2797,7 @@
     },
     "466": {
         "plant_id": "1394169",
-        "plant_name": "Ophrys provincialis (Baumann & Künkele) Paulus",
+        "plant_name": "Ophrys provincialis (Baumann & K\u00c3\u00bcnkele) Paulus",
         "common_name": "Bertoloni's ophrys",
         "conservation_status": "Not Listed"
     },
@@ -3871,7 +3871,7 @@
     },
     "645": {
         "plant_id": "1405685",
-        "plant_name": "Acalypha wilkesiana Müll.Arg.",
+        "plant_name": "Acalypha wilkesiana M\u00c3\u00bcll.Arg.",
         "common_name": "Capa de obispo",
         "conservation_status": "Not Listed"
     },
@@ -3919,7 +3919,7 @@
     },
     "653": {
         "plant_id": "1407379",
-        "plant_name": "Anthurium crystallinum Linden & André",
+        "plant_name": "Anthurium crystallinum Linden & Andr\u00c3\u00a9",
         "common_name": "Flamingo-lily",
         "conservation_status": "Not Listed"
     },
@@ -4057,7 +4057,7 @@
     },
     "676": {
         "plant_id": "1408508",
-        "plant_name": "Phyllanthus niruroides Müll.Arg.",
+        "plant_name": "Phyllanthus niruroides M\u00c3\u00bcll.Arg.",
         "common_name": "Carry me seed",
         "conservation_status": "Not Listed"
     },
@@ -4213,7 +4213,7 @@
     },
     "702": {
         "plant_id": "1409238",
-        "plant_name": "Anthurium andraeanum Linden ex André",
+        "plant_name": "Anthurium andraeanum Linden ex Andr\u00c3\u00a9",
         "common_name": "Flamingo-lily",
         "conservation_status": "Not Listed"
     },
@@ -4969,7 +4969,7 @@
     },
     "828": {
         "plant_id": "1419077",
-        "plant_name": "Lycoris radiata (L'Hér.) Herb.",
+        "plant_name": "Lycoris radiata (L'H\u00c3\u00a9r.) Herb.",
         "common_name": "Red spider lily",
         "conservation_status": "Not Listed"
     },
@@ -4987,7 +4987,7 @@
     },
     "831": {
         "plant_id": "1419112",
-        "plant_name": "Pelargonium crispum (P.J. Bergius) L'Hér.",
+        "plant_name": "Pelargonium crispum (P.J. Bergius) L'H\u00c3\u00a9r.",
         "common_name": "Crisped-leaf pelargonium",
         "conservation_status": "Not Listed"
     },
@@ -5515,7 +5515,7 @@
     },
     "919": {
         "plant_id": "1435714",
-        "plant_name": "Pelargonium zonale (L.) L'Hér. ex Aiton",
+        "plant_name": "Pelargonium zonale (L.) L'H\u00c3\u00a9r. ex Aiton",
         "common_name": "Horseshoe geranium",
         "conservation_status": "Not Listed"
     },
@@ -5821,7 +5821,7 @@
     },
     "970": {
         "plant_id": "1464567",
-        "plant_name": "Anthurium faustomirandae Pérez-Farr. & Croat",
+        "plant_name": "Anthurium faustomirandae P\u00c3\u00a9rez-Farr. & Croat",
         "common_name": "Flamingo-lily",
         "conservation_status": "Not Listed"
     },
@@ -5857,7 +5857,7 @@
     },
     "976": {
         "plant_id": "1486475",
-        "plant_name": "Cereus forbesii C.F.Först.",
+        "plant_name": "Cereus forbesii C.F.F\u00c3\u00b6rst.",
         "common_name": "Desert night-blooming cereus",
         "conservation_status": "Not Listed"
     },
@@ -6043,7 +6043,7 @@
     },
     "1007": {
         "plant_id": "1529205",
-        "plant_name": "Sedum hernandezii J. Meyrán",
+        "plant_name": "Sedum hernandezii J. Meyr\u00c3\u00a1n",
         "common_name": "White stonecrop",
         "conservation_status": "Not Listed"
     },
