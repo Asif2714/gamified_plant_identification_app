@@ -230,6 +230,10 @@ export default function ProfileScreen(props) {
             <Text style={styles.text}>
               Experience Points: {user.experience_points}
             </Text>
+            <Text style={styles.text}>
+          Daily Streak: {user.current_streak || 0} days
+            </Text>
+
           </View>
           <View style={styles.rightSection}>
             <Image
@@ -278,8 +282,8 @@ export default function ProfileScreen(props) {
             {renderMapMarkers()}
           </MapView>
           <TouchableOpacity style={styles.closeMap} onPress={toggleMap}>
-  <Text style={styles.closeMapText}>Close Map</Text>
-</TouchableOpacity>
+                <Text style={styles.closeMapText}>Close Map</Text>
+            </TouchableOpacity>
         </View>
       </Modal>
     </View>
@@ -301,7 +305,7 @@ const styles = StyleSheet.create({
   },
   userInfoSection: {
     width: "100%",
-    backgroundColor: "#fff",
+    backgroundColor: "#F6FBF4",
     borderRadius: 10,
     padding: 20,
     marginBottom: 20,
@@ -310,6 +314,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
     elevation: 3,
+    color: "#252900"
   },
   userInfoRow: {
     flexDirection: "row",
@@ -347,6 +352,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     padding: 12,
+    backgroundColor: "#195100"
     
   },
   mapContainer: {

@@ -1,11 +1,12 @@
 from django.contrib import admin
 
-from .models import User, Plant, Achievement
+from .models import User, Plant, Achievement, UserMetrics
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 # Register your models here.
 admin.site.register(Plant)
 admin.site.register(Achievement)
+admin.site.register(UserMetrics)
 
 # Linking Achievement inline with User
 class AchievementInline(admin.StackedInline):

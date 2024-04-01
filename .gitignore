@@ -14,6 +14,7 @@ backend/db.sqlite3
 migrations/__pycache__/
 backend/identify_app/__pycache__/
 backend/identify_app/migrations/__pycache__/
+backend\identify_app/migrations/
 
 #ignoring identicons and plant images - might be included later | stored in Amazon S3
 backend/media/

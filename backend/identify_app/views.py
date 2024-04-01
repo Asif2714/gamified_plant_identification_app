@@ -13,7 +13,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib import auth
 from rest_framework.authtoken.models import Token
 from django.core.files.storage import default_storage
-from .models import Plant, Achievement
+from .models import Plant, Achievement, UserMetrics
 from datetime import datetime
 import logging
 logger = logging.getLogger(__name__)
@@ -87,6 +87,7 @@ def register(request):
                                    first_name=first_name,last_name=last_name)
         
         Achievement.objects.create(user=user)
+        UserMetrics.objects.create(user=user)
 
         identicon = generator.generate(username, 200, 200,
                                padding=padding, inverted=True, output_format="png")
@@ -119,6 +120,8 @@ def login(request):
         user = auth.authenticate(username=username, password=password)
 
         if user is not None:
+            # Update the daily streak
+            user.update_daily_streak()
             token, _ = Token.objects.get_or_create(user=user)
             print({'token': token.key, 'username': user.username})
             return JsonResponse({'token': token.key, 'username': user.username})
@@ -155,6 +158,7 @@ def get_user_details(request):
                 user = User.objects.get(username=username)  
 
                 profile_name = user.profile_name if user.profile_name else f"{user.first_name} {user.last_name}".strip()
+                current_streak = user.current_streak if hasattr(user, 'current_streak') else 0
 
                 user_data = {
                     'username': user.username,
@@ -162,6 +166,7 @@ def get_user_details(request):
                     'profile_name': profile_name,
                     'profile_picture': user.profile_picture.url if user.profile_picture else None,
                     'experience_points': getattr(user, 'experience_points', 0),
+                    'current_streak': current_streak,
                 }
                 return JsonResponse(user_data)
             except User.DoesNotExist:
@@ -197,6 +202,16 @@ def save_plant_details(request):
             print("got username!")
             scientific_name = request.POST.get('scientific_name')
             common_name = request.POST.get('common_name')
+
+            # Check if the plant with the same name already exists for the user
+            existing_plant = Plant.objects.filter(user=user, scientific_name=scientific_name).exists() or Plant.objects.filter(user=user, common_name=common_name).exists()
+
+            if existing_plant:
+                # the plant already exists, return an error response
+                return JsonResponse({'error': 'Plant with this name already exists.'}, status=400)
+
+
+
             conservation_status = request.POST.get('conservation_status')
             gps_coordinates = request.POST.get('gps_coordinates')
             confidence = float(request.POST.get('confidence'))
@@ -536,6 +551,72 @@ def preprocess_img(image):
     return input_batch
 
 
+
+# User metrics for the spider graph
+def update_user_metrics(user, new_plant_confidence):
+    metrics, created = UserMetrics.objects.get_or_create(user=user)
+
+    # Accuracy
+    total_plants = user.plants.count()
+    total_confidence = total_plants * metrics.accuracy 
+    metrics.accuracy = (total_confidence + new_plant_confidence) / (total_plants + 1)
+
+    # Variety
+    rarities = user.plants.values_list('rarity', flat=True).distinct()
+    metrics.variety = len(rarities) / 6  # 6 Rarities including Not Listed + others
+
+    # Explorer: updating user's 
+    update_explorer_metric(user, metrics)
+
+    # Achiever: count the achievemetns which is set to True
+    achievements = Achievement.objects.get(user=user)
+    total_achievements = 8 
+    unlocked_achievements = 0
+    
+    # Iterate through each field in the Achievement model
+    for field in achievements._meta.get_fields():
+        if isinstance(field, models.BooleanField): 
+            if getattr(achievements, field.name):  # if field is True, increment the count
+                unlocked_achievements += 1
+    metrics.achiever = unlocked_achievements / total_achievements
+    
+    # Update consistency
+    metrics.consistency = min(user.current_streak / 20, 1)  # Assuming max streak is 20 days
+
+    metrics.save()
+
+# Exploerer metrics: calculating based on maximum lat long value upto 5km
+# Can be changed later with a better logic.
+def update_explorer_metric(user, metrics):
+    plants = user.plants.all()
+    latitudes = []
+    longitudes = []
+    
+    for plant in plants:
+        gps_coordinates = plant.gps_coordinates.split(',')
+        latitudes.append(float(gps_coordinates[0]))
+        longitudes.append(float(gps_coordinates[1]))
+    
+    if not latitudes or not longitudes:
+        metrics.explorer = 0
+        return
+    
+    # Assuming 1 degree of latitude or longitude is approximately equal to 111 km
+    # 0.045 degrees will be approximately 5 km
+    # ref: https://education.nationalgeographic.org/resource/longitude/
+    max_lat_spread = 0.045
+    max_lon_spread = 0.045
+    
+    lat_range = max(latitudes) - min(latitudes)
+    lon_range = max(longitudes) - min(longitudes)
+    
+    # get a score between 0 and 1
+    lat_score = min(lat_range / max_lat_spread, 1)
+    lon_score = min(lon_range / max_lon_spread, 1)
+    
+    # Use the average of latitude and longitude scores as the explorer score
+    metrics.explorer = (lat_score + lon_score) / 2
+
 def update_achievements(user):
     achievements, created = Achievement.objects.get_or_create(user=user)
 
@@ -584,4 +665,3 @@ def update_achievements(user):
 
 
     return achievement_messages
-

@@ -22,7 +22,12 @@ export default function TakeImageScreen() {
   const [savePictureModalVisible, setSavePictureModalVisible] = useState(false);
   const [saveSuccessModalVisible, setSaveSuccessModalVisible] = useState(false);
 
-  const [identificationResult, setIdentificationResult] = useState({});
+  const [identificationResult, setIdentificationResult] = useState({
+    scientific_name: '',
+    common_name: '',
+    confidence: 0,
+    conservation_status: ''
+  });
   const [saveSuccessResult, setSaveSuccessResult] = useState({});
 
   const processImage = async (image) => {
