@@ -473,7 +473,7 @@ model_path = os.path.join(os.path.dirname(__file__), 'xp1_weights_best_acc.tar')
 
 loaded_model = torch.load(model_path, map_location=torch.device('cpu'))
 
-model = models.resnet18(pretrained=False)
+model = models.resnet18(weights=None)
 num_ftrs = model.fc.in_features
 model.fc = torch.nn.Linear(num_ftrs, 1081)
 model.load_state_dict(loaded_model['model'])
