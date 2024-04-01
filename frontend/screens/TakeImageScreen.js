@@ -40,7 +40,7 @@ export default function TakeImageScreen() {
       console.log(responseJson, "responseJson");
       setImageDetails(responseJson); // Save the details for later use
   
-      const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence}\nConservation Status (Rarity): ${responseJson.conservation_status}`;
+      const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence.toFixed(4)}\nConservation Status (Rarity): ${responseJson.conservation_status}`;
   
       Alert.alert('Identification Results', formattedResponse, [
         { text: 'OK', onPress: () => showSaveConfirmation(image, responseJson) }
@@ -147,25 +147,32 @@ export default function TakeImageScreen() {
       });
 
       let responseJson = await response.json();
-      console.log(responseJson)
-
-      let achievementsMessage = '';
-      if (responseJson.achievements_updates.length > 0) {
-        achievementsMessage = `New Achievements Unlocked: ${responseJson.achievements_updates.join(', ')}`;
-      }
-
-        const formattedResponse = `The plant has been saved successfully.\nYour achieved score: ${responseJson.final_score_increased}\nYour Total Score: ${responseJson.total_experience_points}${achievementsMessage}`;
+      console.log("Response json:",responseJson)
 
 
-      if (response.ok) {
-        Alert.alert('Save Succesful!', formattedResponse);
-      } else {
-        Alert.alert('Error', 'Could not save the plant details.');
-      }
-    } catch (error) {
-      console.error('Error saving plant details:', error);
-      Alert.alert('Error', 'An error occurred while saving plant details.');
-    }
+
+        if (response.ok) {
+            console.log("saving plant details response ok")
+            let achievementsMessage = '';
+            console.log("checking achievements")
+            console.log(responseJson)
+            if (responseJson.achievements_updates.length > 0) {
+              achievementsMessage = `New Achievements Unlocked: ${responseJson.achievements_updates.join(', ')}`;
+            }
+      
+              const formattedResponse = `The plant has been saved successfully.\nYour achieved score: ${responseJson.final_score_increased}\nYour Total Score: ${responseJson.total_experience_points}${achievementsMessage}`;
+    
+
+            Alert.alert('Save Successful!', formattedResponse);
+          } else {
+            console.log('Error data:', responseJson);
+            const errorMessage = responseJson.error || 'Could not save the plant details.';
+            Alert.alert('Error', errorMessage);
+          }
+          } catch (error) {
+            console.error('Error saving plant details:', error);
+            Alert.alert('Error', "Error saving plant details:");
+          }
   };
 
   

@@ -92,11 +92,35 @@ export default function ChallengesScreen() {
     }
   };
 
+  const fetchUserMetrics = async () => {
+    const username = await AsyncStorage.getItem('username');
+  
+    try {
+        const response = await fetch(`${CONFIG.API_URL}/get-user-metrics/?username=${username}`, {
+        method: 'GET',
+        headers: {
+          // Authorization: `Token ${token}`, 
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('User metrics:', data.user_metrics);
+      } else {
+        console.error('Failed to fetch user metrics:');
+      }
+    } catch (error) {
+      console.error('Error fetching user metrics:', error);
+    }
+  };
+
   // Fetch data everytime the page is focused? TODO: check if useEffect is needed
   useFocusEffect(
     useCallback(() => {
       fetchRarityCounts();
       fetchAchievements();
+      fetchUserMetrics();
     }, [])
   );
 

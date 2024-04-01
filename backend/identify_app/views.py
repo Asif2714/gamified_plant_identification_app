@@ -31,9 +31,8 @@ import base64
 from io import BytesIO
 from django.utils import timezone
 from django.core.serializers import serialize
-from django.db.models import F, Count
+from django.db.models import F, Count,Sum, BooleanField
 import random
-
 
 
 
@@ -177,7 +176,28 @@ def get_user_details(request):
 
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
-    
+
+def get_user_metrics(request):
+    if request.method == 'GET':
+        username = request.GET.get('username')
+        if username:
+            try:
+                user = User.objects.get(username=username)
+                user_metrics = UserMetrics.objects.get(user=user)
+                data = {
+                    'accuracy': user_metrics.accuracy,
+                    'variety': user_metrics.variety,
+                    'explorer': user_metrics.explorer,
+                    'achiever': user_metrics.achiever,
+                    'consistency': user_metrics.consistency,
+                }
+                return JsonResponse({'success': True, 'user_metrics': data})
+            except User.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+        else:
+            return JsonResponse({'error': 'Username not provided'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
 # View functions for relevant plant details
@@ -207,9 +227,9 @@ def save_plant_details(request):
             existing_plant = Plant.objects.filter(user=user, scientific_name=scientific_name).exists() or Plant.objects.filter(user=user, common_name=common_name).exists()
 
             if existing_plant:
+                print("plant already exists!")
                 # the plant already exists, return an error response
                 return JsonResponse({'error': 'Plant with this name already exists.'}, status=400)
-
 
 
             conservation_status = request.POST.get('conservation_status')
@@ -260,6 +280,8 @@ def save_plant_details(request):
         
             if not isinstance(achievements_updates, list):
                 achievements_updates = [achievements_updates]
+
+            update_user_metrics(user)
 
             # Return a success response
             return JsonResponse({
@@ -554,7 +576,8 @@ def preprocess_img(image):
 
 
 # User metrics for the spider graph
-def update_user_metrics(user, new_plant_confidence):
+def update_user_metrics(user):
+    print("Updating user Metrics for user",user.username)
     metrics, created = UserMetrics.objects.get_or_create(user=user)
 
     # Accuracy
@@ -576,7 +599,7 @@ def update_user_metrics(user, new_plant_confidence):
     
     # Iterate through each field in the Achievement model
     for field in achievements._meta.get_fields():
-        if isinstance(field, models.BooleanField): 
+        if isinstance(field, BooleanField): 
             if getattr(achievements, field.name):  # if field is True, increment the count
                 unlocked_achievements += 1
     metrics.achiever = unlocked_achievements / total_achievements
