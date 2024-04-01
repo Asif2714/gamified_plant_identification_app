@@ -214,7 +214,7 @@ def save_plant_details(request):
 
             conservation_status = request.POST.get('conservation_status')
             gps_coordinates = request.POST.get('gps_coordinates')
-            confidence = float(request.POST.get('confidence'))
+            confidence = float(request.POST.get('confidence', 50)) # if confidence missing by any change, we do the midpoint 
             image_file = request.FILES.get('file')
 
             filename = f"{user}_{scientific_name}.{image_file.name.split('.')[-1]}"
@@ -227,6 +227,7 @@ def save_plant_details(request):
                 rarity= conservation_status,
                 gps_coordinates=gps_coordinates,
                 image=image_file,
+                confidence=confidence,
                 date_time_taken=timezone.now()
             )
             # Baseline score baesd on Conservation status / rarity
@@ -557,10 +558,10 @@ def update_user_metrics(user, new_plant_confidence):
     metrics, created = UserMetrics.objects.get_or_create(user=user)
 
     # Accuracy
+    total_confidence = user.plants.aggregate(total=Sum('confidence'))['total'] or 0
     total_plants = user.plants.count()
-    total_confidence = total_plants * metrics.accuracy 
-    metrics.accuracy = (total_confidence + new_plant_confidence) / (total_plants + 1)
-
+    metrics.accuracy = total_confidence / total_plants if total_plants else 0
+    
     # Variety
     rarities = user.plants.values_list('rarity', flat=True).distinct()
     metrics.variety = len(rarities) / 6  # 6 Rarities including Not Listed + others
