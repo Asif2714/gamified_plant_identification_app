@@ -7,21 +7,24 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 admin.site.register(Plant)
 admin.site.register(Achievement)
 admin.site.register(UserMetrics)
+admin.site.register(User)
 
-# Linking Achievement inline with User
-class AchievementInline(admin.StackedInline):
-    model = Achievement
-    can_delete = False
-    verbose_name_plural = 'achievements'
+# Old code
 
-class UserAdmin(BaseUserAdmin):
-    inlines = (AchievementInline, )
+# # Linking Achievement inline with User
+# class AchievementInline(admin.StackedInline):
+#     model = Achievement
+#     can_delete = False
+#     verbose_name_plural = 'achievements'
 
-# Check if the User model is already registered and if so, unregister
-# Updating the existing Users with the inline view for achievements
-try:
-    admin.site.unregister(User)
-except admin.sites.NotRegistered:
-    pass 
+# class UserAdmin(BaseUserAdmin):
+#     inlines = (AchievementInline, )
 
-admin.site.register(User, UserAdmin)
+# # Check if the User model is already registered and if so, unregister
+# # Updating the existing Users with the inline view for achievements
+# try:
+#     admin.site.unregister(User)
+# except admin.sites.NotRegistered:
+#     pass 
+
+# admin.site.register(User, UserAdmin)

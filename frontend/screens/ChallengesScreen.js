@@ -15,7 +15,9 @@ import Icon from "react-native-vector-icons/Ionicons";
 
 import RarityInfoModal from "../modals/RarityInfoModal";
 
+
 import CONFIG from '../app_config';
+import RadarChart from "../components/RadarChart";
 
 // Colors available at https://www.withoutnations.com/portfolio/iucn-red-list/
 const iucnColors = {
@@ -35,6 +37,14 @@ export default function ChallengesScreen() {
     NT: 0,
     LC: 0,
     NL: 0,
+  });
+
+  const [userMetrics, setUserMetrics] = useState({
+    Accuracy: 0,
+    variety: 0,
+    explorer: 0,
+    achiever: 0,
+    consistency: 0,
   });
 
   const [infoModalVisible, setInfoModalVisible] = useState(false);
@@ -107,6 +117,7 @@ export default function ChallengesScreen() {
       if (response.ok) {
         const data = await response.json();
         console.log('User metrics:', data.user_metrics);
+        setUserMetrics(data.user_metrics);
       } else {
         console.error('Failed to fetch user metrics:');
       }
@@ -193,6 +204,11 @@ export default function ChallengesScreen() {
             </View>
           ))}
       </View>
+
+
+
+      <RadarChart metrics={userMetrics } />
+
     </View>
   );
 }

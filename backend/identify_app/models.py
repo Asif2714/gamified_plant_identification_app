@@ -16,15 +16,6 @@ class User(AbstractUser):
     current_streak = models.PositiveIntegerField(default=0)
     average_confidence = models.FloatField(default=0.0)
 
-    # Streak system. This is called when a user logs in in views.py
-    def update_daily_streak(self):
-        if self.last_login_date == timezone.now().date() - timezone.timedelta(days=1):
-            self.current_streak += 1
-        else:
-            self.current_streak = 1
-        self.last_login_date = timezone.now().date()
-        self.save()
-
 class Achievement(models.Model):
     '''
     TODO: Docstring

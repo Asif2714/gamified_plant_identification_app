@@ -119,8 +119,34 @@ def login(request):
         user = auth.authenticate(username=username, password=password)
 
         if user is not None:
-            # Update the daily streak
-            user.update_daily_streak()
+            print("signing in!")
+            # Update the last login and daily streak
+            today = timezone.now().date()
+            last_login_date = user.last_login_date
+            print("last logged in:", last_login_date)
+
+            if last_login_date is None:
+                user.current_streak = 1
+                user.last_login_date = today
+                print("First login! Streak is now 1")
+            # If the last login was yesterday, increment the streak.
+            elif (today - last_login_date).days == 1:
+                user.current_streak += 1
+                user.last_login_date = today
+                print("Streak increased to", user.current_streak)
+            # If the last login was today, do nothing.
+            elif (today - last_login_date).days == 0:
+                print("Streak unchanged")
+            # If the last login was more than one day ago, reset the streak.
+            else:
+                user.current_streak = 1
+                user.last_login_date = today
+                print("Streak has been reset!")
+
+            # Save the changes to the database.
+            # The update_fields parameter tells Django to only save these fields, which is more efficient.
+            user.save(update_fields=['last_login_date', 'current_streak'])
+
             token, _ = Token.objects.get_or_create(user=user)
             print({'token': token.key, 'username': user.username})
             return JsonResponse({'token': token.key, 'username': user.username})

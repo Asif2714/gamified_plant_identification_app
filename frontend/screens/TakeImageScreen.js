@@ -98,12 +98,6 @@ export default function TakeImageScreen() {
   const saveImageDetails = async (selectedImage, details) => {
     const username = await AsyncStorage.getItem('username');
 
-    // if (!imageDetails) {
-    //   console.error('Image details are not available.');
-    //   Alert.alert('Error', 'Image details are not available.');
-    //   return;
-    // }
-
     // Get GPS location
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
