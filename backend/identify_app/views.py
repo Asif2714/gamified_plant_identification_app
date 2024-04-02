@@ -37,6 +37,7 @@ import random
 
 
 # Setting up pydenticon
+# https://pydenticon.readthedocs.io/en/0.3.1/usage.html
 import pydenticon
 import hashlib
 padding = (20, 20, 20, 20)
@@ -125,6 +126,7 @@ def login(request):
             last_login_date = user.last_login_date
             print("last logged in:", last_login_date)
 
+            # setting up streak
             if last_login_date is None:
                 user.current_streak = 1
                 user.last_login_date = today
@@ -143,8 +145,6 @@ def login(request):
                 user.last_login_date = today
                 print("Streak has been reset!")
 
-            # Save the changes to the database.
-            # The update_fields parameter tells Django to only save these fields, which is more efficient.
             user.save(update_fields=['last_login_date', 'current_streak'])
 
             token, _ = Token.objects.get_or_create(user=user)
