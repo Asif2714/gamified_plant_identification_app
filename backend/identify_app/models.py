@@ -68,9 +68,11 @@ class Plant(models.Model):
         return f"{self.common_name} ({self.scientific_name}) by {self.user.username}"
 
 
+class Feedback(models.Model):
+    user = models.CharField(max_length=255)
+    subject = models.CharField(max_length=255)
+    description = models.TextField()
+    date_submitted = models.DateTimeField(auto_now_add=True)
 
-
-#
-# Other methods
-#
-    
+    def __str__(self):
+        return f"By {self.user} on {self.date_submitted}"

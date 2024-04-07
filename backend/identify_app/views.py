@@ -13,7 +13,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib import auth
 from rest_framework.authtoken.models import Token
 from django.core.files.storage import default_storage
-from .models import Plant, Achievement, UserMetrics
+from .models import Plant, Achievement, UserMetrics, Feedback
 from datetime import datetime
 import logging
 logger = logging.getLogger(__name__)
@@ -52,7 +52,9 @@ background = "rgb(224,224,224)"
 generator = pydenticon.Generator(5, 5, digest=hashlib.sha1,
                                  foreground=foreground, background=background)
 
-# View functions for Profile system
+#==============================================
+# View functions for profile system and updates
+#==============================================
 @csrf_exempt
 def register(request):
     """Handles the user registration
@@ -203,30 +205,46 @@ def get_user_details(request):
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
-def get_user_metrics(request):
-    if request.method == 'GET':
-        username = request.GET.get('username')
-        if username:
-            try:
-                user = User.objects.get(username=username)
-                user_metrics = UserMetrics.objects.get(user=user)
-                data = {
-                    'accuracy': user_metrics.accuracy,
-                    'variety': user_metrics.variety,
-                    'explorer': user_metrics.explorer,
-                    'achiever': user_metrics.achiever,
-                    'consistency': user_metrics.consistency,
-                }
-                return JsonResponse({'success': True, 'user_metrics': data})
-            except User.DoesNotExist:
-                return JsonResponse({'error': 'User not found'}, status=404)
-        else:
-            return JsonResponse({'error': 'Username not provided'}, status=400)
+
+
+
+#============================
+# View functions for Feedback
+#============================
+
+@csrf_exempt
+def submit_feedback(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+                
+            username = data.get('username') 
+            subject = data.get('subject')
+            description = data.get('description')
+                
+            # Create feedback entry
+            Feedback.objects.create(
+                user=username,
+                subject=subject,
+                description=description,
+                date_submitted=timezone.now()
+            )
+                
+            return JsonResponse({'message': 'Feedback submitted successfully!'}, status=200)
+        except json.JSONDecodeError as e:
+            return JsonResponse({'error': 'Error decoding JSON sent to backend'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
     else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
+            return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
+
+
+#==========================================
 # View functions for relevant plant details
+#==========================================
+
 
 CONSERVATION_STATUS_SCORES = {
     "CR": 500, # Critically Endangered
@@ -354,7 +372,9 @@ def get_user_plant_with_details(request, username):
         return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
-#Leaderboard system view functions
+#======================================
+# View functions for leaderbaord system
+#======================================
 def get_leaderboard(request):
     if request.method == 'GET':
         # sorting by descending on XP points
@@ -378,7 +398,9 @@ def get_leaderboard(request):
         
 
 
-# Home feed: Getting recent user images
+#==============================================
+# View functions for Homepages and Feed
+#==============================================
     
 def get_plants_for_homepage(request):
     if request.method == 'GET':
@@ -420,6 +442,11 @@ LC -> Least Concerned
 Not Listed
 '''
 
+
+#==============================
+# Challenges Tab View endpoints
+#==============================
+
 @csrf_exempt
 def get_user_plant_counts(request, username):
     if request.method == 'GET':
@@ -452,7 +479,6 @@ def get_user_plant_counts(request, username):
         return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
-# Challenges Section view endpoints
 def get_user_achievements(request, username):
     if request.method == 'GET':
         try:
@@ -477,8 +503,32 @@ def get_user_achievements(request, username):
 
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+def get_user_metrics(request):
+    if request.method == 'GET':
+        username = request.GET.get('username')
+        if username:
+            try:
+                user = User.objects.get(username=username)
+                user_metrics = UserMetrics.objects.get(user=user)
+                data = {
+                    'accuracy': user_metrics.accuracy,
+                    'variety': user_metrics.variety,
+                    'explorer': user_metrics.explorer,
+                    'achiever': user_metrics.achiever,
+                    'consistency': user_metrics.consistency,
+                }
+                return JsonResponse({'success': True, 'user_metrics': data})
+            except User.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+        else:
+            return JsonResponse({'error': 'Username not provided'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-# View functions for predictions
+#==============================================
+# View functions for Plant species Predictions
+#==============================================
 
 
 @csrf_exempt  # TODO: exempt for simplicity, disabling CSRF. For production, we need to include tokens
@@ -552,7 +602,7 @@ def predict_image(request):
 
         if not image_file:
             print("no image!")
-            return JsonResponse({'error': 'No image provided'})
+            return JsonResponse({'error': 'No image provided'}, status=400)
         
         try:
             print("preprocessing")
@@ -579,7 +629,7 @@ def predict_image(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500) #TODO: check,and change to suitable code
  
-    return JsonResponse({'error': 'Invalid request method'}, status=400)  #TODO: check if 400 is correct one for this
+    return JsonResponse({'error': 'Invalid request method'}, status=405) 
 
 
 
@@ -587,7 +637,10 @@ def predict_image(request):
 
 
 
-# Other methods
+
+#==============================================
+# Other Methods Used in Views #################
+#==============================================
 def preprocess_img(image):
     input_image = Image.open(image).convert('RGB')
     preprocess = transforms.Compose([

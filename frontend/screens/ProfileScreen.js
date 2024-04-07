@@ -20,11 +20,13 @@ import MapView, { Marker } from "react-native-maps";
 // import ProfilePlantCarousel from "../components/ProfilePlantCarousel";
 import Slider from "../components/Slider";
 import CONFIG from "../app_config";
+import FeedbackModal from '../modals/FeedbackModal';
 
 export default function ProfileScreen(props) {
   const { user, setUser, setUserToken, setUserId } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(true);
   const [isMapVisible, setIsMapVisible] = useState(false);
+  const [feedbackModalVisible, setFeedbackModalVisible] = useState(false);
 
   // Icons to be used for the profile card section
   const iconsize = 20;
@@ -36,6 +38,20 @@ export default function ProfileScreen(props) {
   // Storing list and details of plants for user
   const [userPlantDetails, setUserPlantDetails] = useState([]);
 
+  // methods to swithc feedback modal visibility
+  const showFeedbackModal = () => {
+    setFeedbackModalVisible(true);
+  };
+
+  const closeFeedbackModal = () => {
+    setFeedbackModalVisible(false);
+  };
+
+  const handleFeedbackSubmission = () => {
+    closeFeedbackModal();
+    Alert.alert("Thank you!", "Your feedback has been submitted");
+  };
+
   const fetchUserDetails = async () => {
     const username = await AsyncStorage.getItem("username");
     console.log(`fetching user details with username: ${username}`);
@@ -44,7 +60,6 @@ export default function ProfileScreen(props) {
       const response = await fetch(request, {
         method: "GET",
         headers: {
-          // Authorization: `Token ${token}`,
           "Content-Type": "application/json",
         },
       });
@@ -74,7 +89,6 @@ export default function ProfileScreen(props) {
       const response = await fetch(`${CONFIG.API_URL}/logout/`, {
         method: "POST",
         headers: {
-          // Authorization: `Token ${userToken}`,
           "Content-Type": "application/json",
         },
       });
@@ -270,13 +284,15 @@ export default function ProfileScreen(props) {
         <TouchableOpacity style={styles.button} onPress={toggleMap}>
           <Text style={styles.buttonText}>See Map</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleFeedbackPress}>
-          <Text style={styles.buttonText}>Feedback</Text>
+        <TouchableOpacity style={styles.button} onPress={showFeedbackModal}>
+            <Text style={styles.buttonText}>Feedback</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleSignOut}>
           <Text style={styles.buttonText}>Log Out</Text>
         </TouchableOpacity>
 
+        {/* Modals */}
+        {/* Map modal */}
         <Modal
           animationType="slide"
           transparent={false}
@@ -311,6 +327,13 @@ export default function ProfileScreen(props) {
             </TouchableOpacity>
           </View>
         </Modal>
+
+        {/* Feedback modal */}
+        <FeedbackModal
+        isVisible={feedbackModalVisible}
+        onClose={closeFeedbackModal}
+        onSubmitFeedback={handleFeedbackSubmission}
+      />
       </View>
     </View>
   );

@@ -16,4 +16,5 @@ urlpatterns = [
     path('get-user-plant-counts/<str:username>/', views.get_user_plant_counts, name='get_user_plant_counts'),
     path('get-user-achievements/<str:username>/', views.get_user_achievements, name='get_user_achievements'),
     path('get-user-metrics/', views.get_user_metrics, name='get-user-metrics'),
+    path('submit-feedback/', views.submit_feedback, name='submit_feedback')
 ]
