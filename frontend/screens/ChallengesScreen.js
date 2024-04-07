@@ -19,8 +19,8 @@ import RarityInfoModal from "../modals/RarityInfoModal";
 import CONFIG from '../app_config';
 import RadarChart from "../components/RadarChart";
 
-// Colors available at https://www.withoutnations.com/portfolio/iucn-red-list/
-const iucnColors = {
+// Colours available at https://www.withoutnations.com/portfolio/iucn-red-list/
+const iucnColours = {
   CR: "#EA5448",
   EN: "#DA891C",
   VU: "#FFC476",
@@ -154,14 +154,16 @@ export default function ChallengesScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerTextRarity}>Rarity of your identified plants</Text>
+      <Text style={styles.headerTextRarity}>
+        Rarity of your identified plants
+      </Text>
       <View style={styles.rarityContainer}>
         {Object.entries(mainRarities).map(([key, value]) => (
           <RarityItem
             key={key}
             title={key}
             count={value}
-            color={iucnColors[key]}
+            color={iucnColours[key]}
           />
         ))}
       </View>
@@ -181,7 +183,6 @@ export default function ChallengesScreen() {
           onClose={() => setInfoModalVisible(false)}
         />
       </View>
-
 
       {/* Achievements */}
       <Text style={styles.headerTextAchievements}>Your Achievements</Text>
@@ -205,10 +206,7 @@ export default function ChallengesScreen() {
           ))}
       </View>
 
-
-
-      <RadarChart metrics={userMetrics } />
-
+      <RadarChart metrics={userMetrics} />
     </View>
   );
 }

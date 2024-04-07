@@ -2,11 +2,7 @@ import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
-// import XPBar from "./components/XPBar";
-import { View, Text, StyleSheet, Button, AppRegistry, processColor } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-  import {RadarChart} from 'react-native-charts-wrapper';
 
 // Screens
 import MainAppScreen from "./screens/MainAppScreen";
@@ -85,13 +81,5 @@ const App = () => {
     </UserProvider>
   );
 };
-
-// const styles = StyleSheet.create({
-//     xpBarContainer: {
-//       height: 20,
-//       backgroundColor: '#000',
-//     },
-
-// });
 
 export default App;

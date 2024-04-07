@@ -14,17 +14,18 @@ export default function Pagination({data}) {
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
-        bottom: 50,
+        bottom: 95,
         flexDirection: 'row',
         width: '100%',
         alignContent: 'center',
         justifyContent: 'center'
     },
     dot: {
-        width: 12,
-        height: 12, 
-        borderRadius: 6, 
+        width: 10,
+        height: 10, 
+        borderRadius: 4,
+        borderWidth: 1,
         marginHorizontal: 3,
-        backgroundColor:'#ccc',
+        backgroundColor:'gray',
     }
 })

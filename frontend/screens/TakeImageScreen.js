@@ -39,8 +39,9 @@ export default function TakeImageScreen() {
       let responseJson = await response.json();
       console.log(responseJson, "responseJson");
       setImageDetails(responseJson); // Save the details for later use
-  
-      const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence.toFixed(4)}\nConservation Status (Rarity): ${responseJson.conservation_status}`;
+      
+      const confidencePercentage = (responseJson.confidence * 100).toFixed(2);
+      const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${confidencePercentage}%\nConservation Status (Rarity): ${responseJson.conservation_status}`;
   
       Alert.alert('Identification Results', formattedResponse, [
         { text: 'OK', onPress: () => showSaveConfirmation(image, responseJson) }
@@ -151,7 +152,7 @@ export default function TakeImageScreen() {
             console.log("checking achievements")
             console.log(responseJson)
             if (responseJson.achievements_updates.length > 0) {
-              achievementsMessage = `New Achievements Unlocked: ${responseJson.achievements_updates.join(', ')}`;
+              achievementsMessage = `\nNew Achievements Unlocked: ${responseJson.achievements_updates.join(', ')}`;
             }
       
               const formattedResponse = `The plant has been saved successfully.\nYour achieved score: ${responseJson.final_score_increased}\nYour Total Score: ${responseJson.total_experience_points}${achievementsMessage}`;
