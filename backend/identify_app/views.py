@@ -345,9 +345,11 @@ def save_plant_details(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     else:
-        # Only allow POST requests
+
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
+# TODO: Combine these, and use only one endiping
+    
 @csrf_exempt
 def get_user_plants(request, username):
     
@@ -368,7 +370,6 @@ def get_user_plant_with_details(request, username):
         serialized_plants_data = serialize("json", plants)
         return JsonResponse({'plants_data': serialized_plants_data})
     else:
-        # Only allow GET requests
         return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
@@ -465,10 +466,9 @@ def get_user_plant_counts(request, username):
                 # Getting the Key from the data
                 rarity = count['rarity']
                 
-                # Setting the value
                 rarity_counts[rarity] = count['count']
 
-            # Restructure the response
+            # Restructure the response to make it easier to use in frontend
             formatted_counts = [{"rarity": rarity, "count": count} for rarity, count in rarity_counts.items()]
 
             return JsonResponse({"rarity_counts": formatted_counts})
@@ -550,11 +550,10 @@ def upload_image(request):
                 
                 # Check the image type using imghdr
                 file_type = imghdr.what(image_file)
-                print(file_type)  # Prints the detected image type
+                print(file_type)  
 
-                # Ensure the file is an image
-                if file_type in ['jpeg', 'png', 'gif']:  # Add other image types as needed
-                    # Process the image or save it here
+                #  the file should be an image
+                if file_type in ['jpeg', 'png', 'gif']:  
                     print(f"Received file: {image_file.name}, Type: {file_type}")
                     return JsonResponse({'message': 'Image received successfully!'}, status=200)
                 else:
@@ -593,7 +592,7 @@ def test_get_request(request):
 @csrf_exempt
 def predict_image(request):
     print("predicting image")
-    # print("Full request data body:", request.body)
+
     if request.method == 'POST':
         print("in post")
         image_file = request.FILES.get('file')
