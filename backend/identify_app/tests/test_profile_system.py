@@ -32,6 +32,18 @@ class ProfileSystemTestCase(TestCase):
         self.assertTrue(User.objects.filter(username='testuserx').exists())
 
 
+    def test_register_user_duplicate(self):
+        user_data = {
+            'username': 'testuser0', 
+            'email': 'testuser0@gmail.com', 
+            'password': 'testpass',
+            'first_name': 'Condition',
+            'last_name': 'Zero'
+        }
+        response = self.client.post(reverse('register'), json.dumps(user_data), content_type='application/json')
+        self.assertNotEqual(response.status_code, 201) 
+
+
     def test_login(self):
         form_data = {
             'username': 'testuser0',
@@ -42,6 +54,16 @@ class ProfileSystemTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('token' in response.json())
 
+
+    def test_login_incorrect_credentials(self):
+        form_data = {
+            'username': 'testuser0',
+            'password': 'verybadpassword!' 
+        }
+        response = self.client.post(reverse('login'), json.dumps(form_data), content_type='application/json')
+        self.assertNotEqual(response.status_code, 200)
+
+
     def test_get_user_details(self):
         response = self.client.get(reverse('get_user_details'), {
             'username': 'testuser0'
@@ -50,3 +72,8 @@ class ProfileSystemTestCase(TestCase):
         user_data = response.json()
         self.assertEqual(user_data['username'], 'testuser0')
         self.assertEqual(user_data['email'], 'testuser0@gmail.com')
+
+
+    def test_get_user_details_nonexistent_user(self):
+        response = self.client.get(reverse('get_user_details'), {'username': 'somerandomuser'})
+        self.assertNotEqual(response.status_code, 200) 

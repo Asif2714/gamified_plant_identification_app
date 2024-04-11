@@ -239,6 +239,113 @@ def submit_feedback(request):
             return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
+#==============================================
+# View functions for Plant species Predictions
+#==============================================
+
+
+@csrf_exempt  # TODO: exempt for simplicity, disabling CSRF. For production, we need to include tokens
+def upload_image(request):
+    print(request.body)
+    if request.method == 'POST':
+        data = request.body.decode('utf-8') 
+        json_data = json.loads(data)
+        image_data = json_data.get('image')
+
+        if image_data:
+            
+            image_data = base64.b64decode(image_data.split(',')[1])
+            image_file = BytesIO(image_data)
+
+            if image_file:
+                # Reset the file pointer to the start
+                image_file.seek(0)
+                
+                # Check the image type using imghdr
+                file_type = imghdr.what(image_file)
+                print(file_type)  
+
+                #  the file should be an image
+                if file_type in ['jpeg', 'png', 'gif']:  
+                    print(f"Received file: {image_file.name}, Type: {file_type}")
+                    return JsonResponse({'message': 'Image received successfully!'}, status=200)
+                else:
+                    return JsonResponse({'error': 'Unsupported image type'}, status=400)
+            else:
+                return JsonResponse({'error': 'No image provided'}, status=400)
+
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+
+# Loading resources and models
+model_path = os.path.join(os.path.dirname(__file__), 'xp1_weights_best_acc.tar')
+
+loaded_model = torch.load(model_path, map_location=torch.device('cpu'))
+
+model = models.resnet18(weights=None)
+num_ftrs = model.fc.in_features
+model.fc = torch.nn.Linear(num_ftrs, 1081)
+model.load_state_dict(loaded_model['model'])
+model.eval()
+
+class_names_file = './identify_app/ordered_id_species.json'
+with open(class_names_file, 'r') as json_input:
+    ordered_species_json = json.load(json_input)
+
+
+
+def test_get_request(request):
+    if request.method == 'GET':
+        return JsonResponse({'Reply:': 'Backend server is running!'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+@csrf_exempt
+def predict_image(request):
+    print("predicting image")
+
+    if request.method == 'POST':
+        print("in post")
+        image_file = request.FILES.get('file')
+        print(request.FILES)
+
+
+        if not image_file:
+            print("no image!")
+            return JsonResponse({'error': 'No image provided'}, status=400)
+        
+        try:
+            print("preprocessing")
+            input_img = preprocess_img(image_file)
+            with torch.no_grad():
+                output = model(input_img)
+                probabilities = torch_functional.softmax(output, dim=1)
+                confidence, predicted_class = probabilities.max(1)
+
+                # TODO: CHECK WHEN there are no predictions, check trello
+
+                if confidence.item() > 0.1:
+                    print("inside confidence")
+                    predicted_class_string = str(predicted_class.item())
+                    if predicted_class_string in ordered_species_json:
+                        classification = ordered_species_json[predicted_class_string]['plant_name']
+                        common_name = ordered_species_json[predicted_class_string]['common_name']
+                        conservation_status = ordered_species_json[predicted_class_string]['conservation_status']
+                        print("Successful")
+                        return JsonResponse({'scientific_name': classification, 'common_name': common_name, 'conservation_status': conservation_status, 'confidence': confidence.item()})
+                    else:
+                        print("")
+                        return JsonResponse({'error': 'Predicted class not in JSON'})
+                else:
+                    print("WARN: low confidence:",confidence.item())
+                    return JsonResponse({'error': 'Confidence too low'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500) #TODO: check,and change to suitable code
+ 
+    return JsonResponse({'error': 'Invalid request method'}, status=405) 
+
 
 
 #==========================================
@@ -525,110 +632,6 @@ def get_user_metrics(request):
             return JsonResponse({'error': 'Username not provided'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-#==============================================
-# View functions for Plant species Predictions
-#==============================================
-
-
-@csrf_exempt  # TODO: exempt for simplicity, disabling CSRF. For production, we need to include tokens
-def upload_image(request):
-    print(request.body)
-    if request.method == 'POST':
-        data = request.body.decode('utf-8') 
-        json_data = json.loads(data)
-        image_data = json_data.get('image')
-
-        if image_data:
-            
-            image_data = base64.b64decode(image_data.split(',')[1])
-            image_file = BytesIO(image_data)
-
-            if image_file:
-                # Reset the file pointer to the start
-                image_file.seek(0)
-                
-                # Check the image type using imghdr
-                file_type = imghdr.what(image_file)
-                print(file_type)  
-
-                #  the file should be an image
-                if file_type in ['jpeg', 'png', 'gif']:  
-                    print(f"Received file: {image_file.name}, Type: {file_type}")
-                    return JsonResponse({'message': 'Image received successfully!'}, status=200)
-                else:
-                    return JsonResponse({'error': 'Unsupported image type'}, status=400)
-            else:
-                return JsonResponse({'error': 'No image provided'}, status=400)
-
-        return JsonResponse({'error': 'Invalid request'}, status=400)
-
-
-
-# Loading resources and models
-model_path = os.path.join(os.path.dirname(__file__), 'xp1_weights_best_acc.tar')
-
-loaded_model = torch.load(model_path, map_location=torch.device('cpu'))
-
-model = models.resnet18(weights=None)
-num_ftrs = model.fc.in_features
-model.fc = torch.nn.Linear(num_ftrs, 1081)
-model.load_state_dict(loaded_model['model'])
-model.eval()
-
-class_names_file = './identify_app/ordered_id_species.json'
-with open(class_names_file, 'r') as json_input:
-    ordered_species_json = json.load(json_input)
-
-
-
-def test_get_request(request):
-    if request.method == 'GET':
-        return JsonResponse({'message': 'GET request received!'}, status=200)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
-
-
-@csrf_exempt
-def predict_image(request):
-    print("predicting image")
-
-    if request.method == 'POST':
-        print("in post")
-        image_file = request.FILES.get('file')
-        print(request.FILES)
-
-
-        if not image_file:
-            print("no image!")
-            return JsonResponse({'error': 'No image provided'}, status=400)
-        
-        try:
-            print("preprocessing")
-            input_img = preprocess_img(image_file)
-            with torch.no_grad():
-                output = model(input_img)
-                probabilities = torch_functional.softmax(output, dim=1)
-                confidence, predicted_class = probabilities.max(1)
-
-                if confidence.item() > 0.1:
-                    print("inside confidence")
-                    predicted_class_string = str(predicted_class.item())
-                    if predicted_class_string in ordered_species_json:
-                        classification = ordered_species_json[predicted_class_string]['plant_name']
-                        common_name = ordered_species_json[predicted_class_string]['common_name']
-                        conservation_status = ordered_species_json[predicted_class_string]['conservation_status']
-                        print("Successful")
-                        return JsonResponse({'scientific_name': classification, 'common_name': common_name, 'conservation_status': conservation_status, 'confidence': confidence.item()})
-                    else:
-                        print("")
-                        return JsonResponse({'error': 'Predicted class not in JSON'})
-                else:
-                    return JsonResponse({'error': 'Confidence too low'})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500) #TODO: check,and change to suitable code
- 
-    return JsonResponse({'error': 'Invalid request method'}, status=405) 
 
 
 
