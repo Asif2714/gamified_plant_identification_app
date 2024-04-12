@@ -11,6 +11,7 @@ backend/backend/__pycache__/
 model_training/saved_models/model.pth
 backend/identify_app/__pycache__
 backend/db.sqlite3
+model_training/grid_search_model_training.ipynb
 
 #ignoring identicons and plant images - might be included later | stored in Amazon S3
 backend/media/
