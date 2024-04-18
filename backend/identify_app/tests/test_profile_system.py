@@ -44,6 +44,7 @@ class ProfileSystemTestCase(TestCase):
         self.assertNotEqual(response.status_code, 201) 
 
 
+
     def test_login(self):
         form_data = {
             'username': 'testuser0',
@@ -77,3 +78,7 @@ class ProfileSystemTestCase(TestCase):
     def test_get_user_details_nonexistent_user(self):
         response = self.client.get(reverse('get_user_details'), {'username': 'somerandomuser'})
         self.assertNotEqual(response.status_code, 200) 
+
+
+    # def test_login_logout(self):
+        

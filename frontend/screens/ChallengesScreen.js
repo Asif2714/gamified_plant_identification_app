@@ -17,8 +17,7 @@ import RarityInfoModal from "../modals/RarityInfoModal";
 
 
 import CONFIG from '../app_config';
-import RadarChart from "../components/RadarChart";
-
+import BarChart from "../components/BarChart";
 // Colours available at https://www.withoutnations.com/portfolio/iucn-red-list/
 const iucnColours = {
   CR: "#EA5448",
@@ -206,7 +205,7 @@ export default function ChallengesScreen() {
           ))}
       </View>
 
-      <RadarChart metrics={userMetrics} />
+      <BarChart metrics={userMetrics} />
     </View>
   );
 }
