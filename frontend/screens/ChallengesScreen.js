@@ -15,10 +15,11 @@ import Icon from "react-native-vector-icons/Ionicons";
 
 import RarityInfoModal from "../modals/RarityInfoModal";
 
-import CONFIG from '../app_config';
 
-// Colors available at https://www.withoutnations.com/portfolio/iucn-red-list/
-const iucnColors = {
+import CONFIG from '../app_config';
+import BarChart from "../components/BarChart";
+// Colours available at https://www.withoutnations.com/portfolio/iucn-red-list/
+const iucnColours = {
   CR: "#EA5448",
   EN: "#DA891C",
   VU: "#FFC476",
@@ -35,6 +36,14 @@ export default function ChallengesScreen() {
     NT: 0,
     LC: 0,
     NL: 0,
+  });
+
+  const [userMetrics, setUserMetrics] = useState({
+    Accuracy: 0,
+    variety: 0,
+    explorer: 0,
+    achiever: 0,
+    consistency: 0,
   });
 
   const [infoModalVisible, setInfoModalVisible] = useState(false);
@@ -92,11 +101,36 @@ export default function ChallengesScreen() {
     }
   };
 
+  const fetchUserMetrics = async () => {
+    const username = await AsyncStorage.getItem('username');
+  
+    try {
+        const response = await fetch(`${CONFIG.API_URL}/get-user-metrics/?username=${username}`, {
+        method: 'GET',
+        headers: {
+          // Authorization: `Token ${token}`, 
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('User metrics:', data.user_metrics);
+        setUserMetrics(data.user_metrics);
+      } else {
+        console.error('Failed to fetch user metrics:');
+      }
+    } catch (error) {
+      console.error('Error fetching user metrics:', error);
+    }
+  };
+
   // Fetch data everytime the page is focused? TODO: check if useEffect is needed
   useFocusEffect(
     useCallback(() => {
       fetchRarityCounts();
       fetchAchievements();
+      fetchUserMetrics();
     }, [])
   );
 
@@ -119,14 +153,16 @@ export default function ChallengesScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerTextRarity}>Rarity of your identified plants</Text>
+      <Text style={styles.headerTextRarity}>
+        Rarity of your identified plants
+      </Text>
       <View style={styles.rarityContainer}>
         {Object.entries(mainRarities).map(([key, value]) => (
           <RarityItem
             key={key}
             title={key}
             count={value}
-            color={iucnColors[key]}
+            color={iucnColours[key]}
           />
         ))}
       </View>
@@ -146,7 +182,6 @@ export default function ChallengesScreen() {
           onClose={() => setInfoModalVisible(false)}
         />
       </View>
-
 
       {/* Achievements */}
       <Text style={styles.headerTextAchievements}>Your Achievements</Text>
@@ -169,6 +204,8 @@ export default function ChallengesScreen() {
             </View>
           ))}
       </View>
+
+      <BarChart metrics={userMetrics} />
     </View>
   );
 }

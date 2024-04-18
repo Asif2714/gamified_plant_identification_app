@@ -11,6 +11,10 @@ backend/backend/__pycache__/
 model_training/saved_models/model.pth
 backend/identify_app/__pycache__
 backend/db.sqlite3
+migrations/__pycache__/
+backend/identify_app/__pycache__/
+backend/identify_app/migrations/__pycache__/
+backend\identify_app/migrations/
 model_training/grid_search_model_training.ipynb
 model_training/final_model_training step7epoch70.ipynb
 model_training/adamW0005_model_training.ipynb

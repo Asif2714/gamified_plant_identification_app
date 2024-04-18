@@ -45,7 +45,11 @@ https://docs.djangoproject.com/en/5.0/topics/db/examples/one_to_one/ -> OneToOne
 https://www.queworx.com/django/django-get_or_create/ -> For creating new unique Achievemtns for each user 
 https://docs.djangoproject.com/en/5.0/ref/contrib/admin/#django.contrib.admin.StackedInline -> stackedInline for showing achievements in User page in django admin
 https://docs.expo.dev/versions/latest/sdk/imagepicker/ -> Launch camera + original for launch gallery
-
+https://stackoverflow.com/questions/58558989/what-does-djangos-property-do -> using property for the spider graph section.
+https://dev.to/simbamkenya/building-spider-chart-with-d3-js-and-react-js-50pj -> Radar chart 
+https://github.com/wuxudong/react-native-charts-wrapper?tab=readme-ov-file -> THe charts I used for the user metrics
+https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing -> Full testing instructions for django
+https://stackoverflow.com/questions/5875111/running-a-specific-test-case-in-django-when-your-app-has-a-tests-directory -> running a single test: manage.py test -k test_name
 
 Tutorials:
 https://www.youtube.com/watch?v=4fT2kmTWGwE&list=PLgjw1dR712joAlRdIc6BMNhX6_hrsL7kE&index=3 -> React native Bottom Tabs

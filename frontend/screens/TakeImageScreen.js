@@ -6,34 +6,27 @@ import axios from "axios";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Location from "expo-location";
+import * as Location from 'expo-location';
 
 import { Ionicons } from "@expo/vector-icons";
-import CONFIG from "../app_config";
+import CONFIG from '../app_config';
 
-import IdentificationResultModal from "../modals/IdentificationResultModal";
+
+
 
 export default function TakeImageScreen() {
   const [imageIdentified, setImage] = useState(null);
   const [imageDetails, setImageDetails] = useState(null);
 
-  const [identificationModalVisible, setIdentificationModalVisible] =
-    useState(false);
-  const [savePictureModalVisible, setSavePictureModalVisible] = useState(false);
-  const [saveSuccessModalVisible, setSaveSuccessModalVisible] = useState(false);
-
-  const [identificationResult, setIdentificationResult] = useState({});
-  const [saveSuccessResult, setSaveSuccessResult] = useState({});
-
   const processImage = async (image) => {
     const formdata = new FormData();
-
+    
     formdata.append("file", {
       uri: image.uri,
       type: image.mimeType || "image/jpeg",
       name: image.fileName || "uploaded_image.jpg",
     });
-
+  
     try {
       let response = await fetch(`${CONFIG.API_URL}/predict/`, {
         method: "POST",
@@ -42,15 +35,18 @@ export default function TakeImageScreen() {
           "Content-Type": "multipart/form-data",
         },
       });
-
+  
       let responseJson = await response.json();
       console.log(responseJson, "responseJson");
       setImageDetails(responseJson); // Save the details for later use
-
-      const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${responseJson.confidence}\nConservation Status (Rarity): ${responseJson.conservation_status}`;
-
-      setIdentificationResult(responseJson);
-      setIdentificationModalVisible(true);
+      
+      const confidencePercentage = (responseJson.confidence * 100).toFixed(2);
+      const formattedResponse = `Scientific Name: ${responseJson.scientific_name}\nCommon Name: ${responseJson.common_name}\nConfidence: ${confidencePercentage}%\nConservation Status (Rarity): ${responseJson.conservation_status}`;
+  
+      Alert.alert('Identification Results', formattedResponse, [
+        { text: 'OK', onPress: () => showSaveConfirmation(image, responseJson) }
+      ]);
+  
     } catch (error) {
       console.error(error);
       Alert.alert(
@@ -59,7 +55,7 @@ export default function TakeImageScreen() {
       );
     }
   };
-
+  
   const pickImageFromGallery = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -67,104 +63,114 @@ export default function TakeImageScreen() {
       aspect: [4, 3],
       quality: 1,
     });
-
+  
     if (!result.canceled) {
-      setImage(result.assets[0]); // Save image for later use
+      setImage(result.assets[0]);  // Save image for later use
       await processImage(result.assets[0]);
     }
   };
-
+  
   const takeImageWithCamera = async () => {
     let result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-
+  
     if (!result.canceled) {
-      setImage(result.assets[0]);
+      setImage(result.assets[0]); 
       await processImage(result.assets[0]);
     }
   };
 
   const showSaveConfirmation = (image, details) => {
-    Alert.alert("Save Picture", "Do you want to save this picture?", [
-      { text: "No" },
-      { text: "Yes", onPress: () => saveImageDetails(image, details) },
-    ]);
+    Alert.alert(
+      'Save Picture',
+      'Do you want to save this picture?',
+      [
+        { text: 'No' },
+        { text: 'Yes', onPress: () => saveImageDetails(image, details) } 
+      ]
+    );
   };
+
 
   // Saving the image to django backend
   const saveImageDetails = async (selectedImage, details) => {
-    const username = await AsyncStorage.getItem("username");
+    const username = await AsyncStorage.getItem('username');
 
     // Get GPS location
     const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert(
-        "Permission Denied",
-        "Need access to location to store image"
-      );
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'Need access to location to store image');
       return;
     }
-    console.log("Getting location:");
+    console.log("Getting location:")
     const location = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Highest,
-      maximumAge: 10000,
-      timeout: 5000,
-    });
+        accuracy: Location.Accuracy.Highest,
+        maximumAge: 10000,
+        timeout: 5000
+      });
     console.log(`Location found: ${location}`);
     const gpsCoordinates = `${location.coords.latitude},${location.coords.longitude}`;
 
-    console.log(gpsCoordinates);
+    console.log(gpsCoordinates)
 
     //TODO: create a view function to check if the plant picture is already saved
 
     const formData = new FormData();
-    formData.append("file", {
-      uri: selectedImage.uri, // from pickImageAndSend
-      type: "image/jpeg",
-      name: "plant.jpg",
+    formData.append('file', {
+      uri: selectedImage.uri,  // from pickImageAndSend
+      type: 'image/jpeg',
+      name: 'plant.jpg'
     });
-    formData.append("scientific_name", details.scientific_name);
-    formData.append("common_name", details.common_name);
-    formData.append("conservation_status", details.conservation_status);
-    formData.append("gps_coordinates", gpsCoordinates);
-    formData.append("username", username);
-    formData.append("confidence", details.confidence);
+    formData.append('scientific_name', details.scientific_name);
+    formData.append('common_name', details.common_name);
+    formData.append('conservation_status', details.conservation_status);
+    formData.append('gps_coordinates', gpsCoordinates);
+    formData.append('username', username);
+    formData.append('confidence', details.confidence)
 
     try {
       const response = await fetch(`${CONFIG.API_URL}/save-plant-details/`, {
-        method: "POST",
+        method: 'POST',
         headers: {
           // 'Authorization': `Token ${userToken}`,
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'multipart/form-data',
         },
         body: formData,
       });
 
       let responseJson = await response.json();
-      console.log(responseJson);
+      console.log("Response json:",responseJson)
 
-      let achievementsMessage = "";
-      if (responseJson.achievements_updates.length > 0) {
-        achievementsMessage = `New Achievements Unlocked: ${responseJson.achievements_updates.join(
-          ", "
-        )}`;
-      }
 
-      const formattedResponse = `The plant has been saved successfully.\nYour achieved score: ${responseJson.final_score_increased}\nYour Total Score: ${responseJson.total_experience_points}${achievementsMessage}`;
 
-      if (response.ok) {
-        Alert.alert("Save Succesful!", formattedResponse);
-      } else {
-        Alert.alert("Error", "Could not save the plant details.");
-      }
-    } catch (error) {
-      console.error("Error saving plant details:", error);
-      Alert.alert("Error", "An error occurred while saving plant details.");
-    }
+        if (response.ok) {
+            console.log("saving plant details response ok")
+            let achievementsMessage = '';
+            console.log("checking achievements")
+            console.log(responseJson)
+            if (responseJson.achievements_updates.length > 0) {
+              achievementsMessage = `\nNew Achievements Unlocked: ${responseJson.achievements_updates.join(', ')}`;
+            }
+      
+              const formattedResponse = `The plant has been saved successfully.\nYour achieved score: ${responseJson.final_score_increased}\nYour Total Score: ${responseJson.total_experience_points}${achievementsMessage}`;
+    
+
+            Alert.alert('Save Successful!', formattedResponse);
+          } else {
+            console.log('Error data:', responseJson);
+            const errorMessage = responseJson.error || 'Could not save the plant details.';
+            Alert.alert('Error', errorMessage);
+          }
+          } catch (error) {
+            console.error('Error saving plant details:', error);
+            Alert.alert('Error', "Error saving plant details:");
+          }
   };
+
+  
 
   const testServerConnection = async () => {
     try {
@@ -180,84 +186,72 @@ export default function TakeImageScreen() {
     }
   };
 
+
+
+
+
   return (
     <View style={styles.container}>
       <View style={styles.optionContainer}>
-        <TouchableOpacity
-          style={[styles.optionButton, styles.optionButtonLeft]}
-          onPress={pickImageFromGallery}
-        >
+        <TouchableOpacity style={[styles.optionButton, styles.optionButtonLeft]}  onPress={pickImageFromGallery}>
           <Ionicons name="images-outline" size={50} color="#252900" />
           <Text style={styles.optionText}>Pick Image from Gallery</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.optionButton}
-          onPress={takeImageWithCamera}
-        >
+        <TouchableOpacity style={styles.optionButton} onPress={takeImageWithCamera}>
           <Ionicons name="camera-outline" size={50} color="#252900" />
           <Text style={styles.optionText}>Take Image with Camera</Text>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
-        style={styles.testServerButton}
-        onPress={testServerConnection}
-      >
+      <TouchableOpacity style={styles.testServerButton} onPress={testServerConnection}>
         <Text style={styles.testServerText}>Test Server Connection</Text>
       </TouchableOpacity>
-
-      {/* Modals */}
-      <IdentificationResultModal
-        visible={identificationModalVisible}
-        onClose={() => setIdentificationModalVisible(false)}
-        result={identificationResult}
-      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#F6FBF4",
-  },
-  optionContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "95%",
-  },
-  optionButton: {
-    flex: 1,
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-    borderColor: "#195100",
-    borderWidth: 2,
-    borderRadius: 10,
-    margin: 10,
-    textAlign: "center",
-  },
-  optionButtonLeft: {
-    marginRight: 5,
-  },
-  optionText: {
-    marginTop: 10,
-    color: "#252900",
-    fontWeight: "bold",
-  },
-  testServerButton: {
-    marginTop: 30,
-    padding: 15,
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: "#195100",
-  },
-  testServerText: {
-    color: "black",
-    fontWeight: "bold",
-  },
-});
+    container: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "#F6FBF4",
+    },
+    optionContainer: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      width: "95%",
+    },
+    optionButton: {
+        flex: 1, 
+        alignItems: "center",
+        padding: 20,
+        backgroundColor: "#fff",
+        borderColor: "#195100", 
+        borderWidth: 2,
+        borderRadius: 10,
+        margin: 10,
+        textAlign: "center"
+      },
+    optionButtonLeft: { 
+        marginRight: 5, 
+      },
+    optionText: {
+      marginTop: 10,
+      color: "#252900", 
+      fontWeight: "bold",
+    },
+    testServerButton: {
+      marginTop: 30,
+      padding: 15,
+      backgroundColor: "#fff", 
+      borderRadius: 20,
+      borderWidth: 2,
+      borderColor: "#195100"
+    },
+    testServerText: {
+      color: "black", 
+      fontWeight: "bold",
+    },
+  });

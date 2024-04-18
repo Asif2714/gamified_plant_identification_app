@@ -13,7 +13,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib import auth
 from rest_framework.authtoken.models import Token
 from django.core.files.storage import default_storage
-from .models import Plant, Achievement
+from .models import Plant, Achievement, UserMetrics, Feedback
 from datetime import datetime
 import logging
 logger = logging.getLogger(__name__)
@@ -31,13 +31,13 @@ import base64
 from io import BytesIO
 from django.utils import timezone
 from django.core.serializers import serialize
-from django.db.models import F, Count
+from django.db.models import F, Count,Sum, BooleanField
 import random
 
 
 
-
 # Setting up pydenticon
+# https://pydenticon.readthedocs.io/en/0.3.1/usage.html
 import pydenticon
 import hashlib
 padding = (20, 20, 20, 20)
@@ -52,7 +52,9 @@ background = "rgb(224,224,224)"
 generator = pydenticon.Generator(5, 5, digest=hashlib.sha1,
                                  foreground=foreground, background=background)
 
-# View functions for Profile system
+#==============================================
+# View functions for profile system and updates
+#==============================================
 @csrf_exempt
 def register(request):
     """Handles the user registration
@@ -87,6 +89,7 @@ def register(request):
                                    first_name=first_name,last_name=last_name)
         
         Achievement.objects.create(user=user)
+        UserMetrics.objects.create(user=user)
 
         identicon = generator.generate(username, 200, 200,
                                padding=padding, inverted=True, output_format="png")
@@ -119,6 +122,33 @@ def login(request):
         user = auth.authenticate(username=username, password=password)
 
         if user is not None:
+            print("signing in!")
+            # Update the last login and daily streak
+            today = timezone.now().date()
+            last_login_date = user.last_login_date
+            print("last logged in:", last_login_date)
+
+            # setting up streak
+            if last_login_date is None:
+                user.current_streak = 1
+                user.last_login_date = today
+                print("First login! Streak is now 1")
+            # If the last login was yesterday, increment the streak.
+            elif (today - last_login_date).days == 1:
+                user.current_streak += 1
+                user.last_login_date = today
+                print("Streak increased to", user.current_streak)
+            # If the last login was today, do nothing.
+            elif (today - last_login_date).days == 0:
+                print("Streak unchanged")
+            # If the last login was more than one day ago, reset the streak.
+            else:
+                user.current_streak = 1
+                user.last_login_date = today
+                print("Streak has been reset!")
+
+            user.save(update_fields=['last_login_date', 'current_streak'])
+
             token, _ = Token.objects.get_or_create(user=user)
             print({'token': token.key, 'username': user.username})
             return JsonResponse({'token': token.key, 'username': user.username})
@@ -155,6 +185,7 @@ def get_user_details(request):
                 user = User.objects.get(username=username)  
 
                 profile_name = user.profile_name if user.profile_name else f"{user.first_name} {user.last_name}".strip()
+                current_streak = user.current_streak if hasattr(user, 'current_streak') else 0
 
                 user_data = {
                     'username': user.username,
@@ -162,6 +193,7 @@ def get_user_details(request):
                     'profile_name': profile_name,
                     'profile_picture': user.profile_picture.url if user.profile_picture else None,
                     'experience_points': getattr(user, 'experience_points', 0),
+                    'current_streak': current_streak,
                 }
                 return JsonResponse(user_data)
             except User.DoesNotExist:
@@ -172,10 +204,154 @@ def get_user_details(request):
 
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
-    
 
 
+
+
+#============================
+# View functions for Feedback
+#============================
+
+@csrf_exempt
+def submit_feedback(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+                
+            username = data.get('username') 
+            subject = data.get('subject')
+            description = data.get('description')
+                
+            # Create feedback entry
+            Feedback.objects.create(
+                user=username,
+                subject=subject,
+                description=description,
+                date_submitted=timezone.now()
+            )
+                
+            return JsonResponse({'message': 'Feedback submitted successfully!'}, status=200)
+        except json.JSONDecodeError as e:
+            return JsonResponse({'error': 'Error decoding JSON sent to backend'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+            return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+#==============================================
+# View functions for Plant species Predictions
+#==============================================
+
+
+@csrf_exempt  # TODO: exempt for simplicity, disabling CSRF. For production, we need to include tokens
+def upload_image(request):
+    print(request.body)
+    if request.method == 'POST':
+        data = request.body.decode('utf-8') 
+        json_data = json.loads(data)
+        image_data = json_data.get('image')
+
+        if image_data:
+            
+            image_data = base64.b64decode(image_data.split(',')[1])
+            image_file = BytesIO(image_data)
+
+            if image_file:
+                # Reset the file pointer to the start
+                image_file.seek(0)
+                
+                # Check the image type using imghdr
+                file_type = imghdr.what(image_file)
+                print(file_type)  
+
+                #  the file should be an image
+                if file_type in ['jpeg', 'png', 'gif']:  
+                    print(f"Received file: {image_file.name}, Type: {file_type}")
+                    return JsonResponse({'message': 'Image received successfully!'}, status=200)
+                else:
+                    return JsonResponse({'error': 'Unsupported image type'}, status=400)
+            else:
+                return JsonResponse({'error': 'No image provided'}, status=400)
+
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+
+# Loading resources and models
+model_path = os.path.join(os.path.dirname(__file__), 'xp1_weights_best_acc.tar')
+
+loaded_model = torch.load(model_path, map_location=torch.device('cpu'))
+
+model = models.resnet18(weights=None)
+num_ftrs = model.fc.in_features
+model.fc = torch.nn.Linear(num_ftrs, 1081)
+model.load_state_dict(loaded_model['model'])
+model.eval()
+
+class_names_file = './identify_app/ordered_id_species.json'
+with open(class_names_file, 'r') as json_input:
+    ordered_species_json = json.load(json_input)
+
+
+
+def test_get_request(request):
+    if request.method == 'GET':
+        return JsonResponse({'Reply:': 'Backend server is running!'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+@csrf_exempt
+def predict_image(request):
+    print("predicting image")
+
+    if request.method == 'POST':
+        print("in post")
+        image_file = request.FILES.get('file')
+        print(request.FILES)
+
+
+        if not image_file:
+            print("no image!")
+            return JsonResponse({'error': 'No image provided'}, status=400)
+        
+        try:
+            print("preprocessing")
+            input_img = preprocess_img(image_file)
+            with torch.no_grad():
+                output = model(input_img)
+                probabilities = torch_functional.softmax(output, dim=1)
+                confidence, predicted_class = probabilities.max(1)
+
+                # TODO: CHECK WHEN there are no predictions, check trello
+
+                if confidence.item() > 0.1:
+                    print("inside confidence")
+                    predicted_class_string = str(predicted_class.item())
+                    if predicted_class_string in ordered_species_json:
+                        classification = ordered_species_json[predicted_class_string]['plant_name']
+                        common_name = ordered_species_json[predicted_class_string]['common_name']
+                        conservation_status = ordered_species_json[predicted_class_string]['conservation_status']
+                        print("Successful")
+                        return JsonResponse({'scientific_name': classification, 'common_name': common_name, 'conservation_status': conservation_status, 'confidence': confidence.item()})
+                    else:
+                        print("")
+                        return JsonResponse({'error': 'Predicted class not in JSON'})
+                else:
+                    print("WARN: low confidence:",confidence.item())
+                    return JsonResponse({'error': 'Confidence too low'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500) #TODO: check,and change to suitable code
+ 
+    return JsonResponse({'error': 'Invalid request method'}, status=405) 
+
+
+
+#==========================================
 # View functions for relevant plant details
+#==========================================
+
 
 CONSERVATION_STATUS_SCORES = {
     "CR": 500, # Critically Endangered
@@ -197,9 +373,19 @@ def save_plant_details(request):
             print("got username!")
             scientific_name = request.POST.get('scientific_name')
             common_name = request.POST.get('common_name')
+
+            # Check if the plant with the same name already exists for the user
+            existing_plant = Plant.objects.filter(user=user, scientific_name=scientific_name).exists() or Plant.objects.filter(user=user, common_name=common_name).exists()
+
+            if existing_plant:
+                print("plant already exists!")
+                # the plant already exists, return an error response
+                return JsonResponse({'error': 'Plant with this name already exists.'}, status=400)
+
+
             conservation_status = request.POST.get('conservation_status')
             gps_coordinates = request.POST.get('gps_coordinates')
-            confidence = float(request.POST.get('confidence'))
+            confidence = float(request.POST.get('confidence', 50)) # if confidence missing by any change, we do the midpoint 
             image_file = request.FILES.get('file')
 
             filename = f"{user}_{scientific_name}.{image_file.name.split('.')[-1]}"
@@ -212,6 +398,7 @@ def save_plant_details(request):
                 rarity= conservation_status,
                 gps_coordinates=gps_coordinates,
                 image=image_file,
+                confidence=confidence,
                 date_time_taken=timezone.now()
             )
             # Baseline score baesd on Conservation status / rarity
@@ -245,6 +432,8 @@ def save_plant_details(request):
             if not isinstance(achievements_updates, list):
                 achievements_updates = [achievements_updates]
 
+            update_user_metrics(user)
+
             # Return a success response
             return JsonResponse({
                 'success': 'Plant details saved successfully!',
@@ -263,9 +452,11 @@ def save_plant_details(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     else:
-        # Only allow POST requests
+
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
+# TODO: Combine these, and use only one endiping
+    
 @csrf_exempt
 def get_user_plants(request, username):
     
@@ -286,11 +477,12 @@ def get_user_plant_with_details(request, username):
         serialized_plants_data = serialize("json", plants)
         return JsonResponse({'plants_data': serialized_plants_data})
     else:
-        # Only allow GET requests
         return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
-#Leaderboard system view functions
+#======================================
+# View functions for leaderbaord system
+#======================================
 def get_leaderboard(request):
     if request.method == 'GET':
         # sorting by descending on XP points
@@ -314,7 +506,9 @@ def get_leaderboard(request):
         
 
 
-# Home feed: Getting recent user images
+#==============================================
+# View functions for Homepages and Feed
+#==============================================
     
 def get_plants_for_homepage(request):
     if request.method == 'GET':
@@ -356,6 +550,11 @@ LC -> Least Concerned
 Not Listed
 '''
 
+
+#==============================
+# Challenges Tab View endpoints
+#==============================
+
 @csrf_exempt
 def get_user_plant_counts(request, username):
     if request.method == 'GET':
@@ -374,10 +573,9 @@ def get_user_plant_counts(request, username):
                 # Getting the Key from the data
                 rarity = count['rarity']
                 
-                # Setting the value
                 rarity_counts[rarity] = count['count']
 
-            # Restructure the response
+            # Restructure the response to make it easier to use in frontend
             formatted_counts = [{"rarity": rarity, "count": count} for rarity, count in rarity_counts.items()]
 
             return JsonResponse({"rarity_counts": formatted_counts})
@@ -388,7 +586,6 @@ def get_user_plant_counts(request, username):
         return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
-# Challenges Section view endpoints
 def get_user_achievements(request, username):
     if request.method == 'GET':
         try:
@@ -413,117 +610,39 @@ def get_user_achievements(request, username):
 
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
-
-# View functions for predictions
-
-
-@csrf_exempt  # TODO: exempt for simplicity, disabling CSRF. For production, we need to include tokens
-def upload_image(request):
-    print(request.body)
-    if request.method == 'POST':
-        data = request.body.decode('utf-8') 
-        json_data = json.loads(data)
-        image_data = json_data.get('image')
-
-        if image_data:
-            
-            image_data = base64.b64decode(image_data.split(',')[1])
-            image_file = BytesIO(image_data)
-
-            if image_file:
-                # Reset the file pointer to the start
-                image_file.seek(0)
-                
-                # Check the image type using imghdr
-                file_type = imghdr.what(image_file)
-                print(file_type)  # Prints the detected image type
-
-                # Ensure the file is an image
-                if file_type in ['jpeg', 'png', 'gif']:  # Add other image types as needed
-                    # Process the image or save it here
-                    print(f"Received file: {image_file.name}, Type: {file_type}")
-                    return JsonResponse({'message': 'Image received successfully!'}, status=200)
-                else:
-                    return JsonResponse({'error': 'Unsupported image type'}, status=400)
-            else:
-                return JsonResponse({'error': 'No image provided'}, status=400)
-
-        return JsonResponse({'error': 'Invalid request'}, status=400)
-
-
-
-# Loading resources and models
-model_path = os.path.join(os.path.dirname(__file__), 'xp1_weights_best_acc.tar')
-
-loaded_model = torch.load(model_path, map_location=torch.device('cpu'))
-
-model = models.resnet18(pretrained=False)
-num_ftrs = model.fc.in_features
-model.fc = torch.nn.Linear(num_ftrs, 1081)
-model.load_state_dict(loaded_model['model'])
-model.eval()
-
-class_names_file = './identify_app/ordered_id_species.json'
-with open(class_names_file, 'r') as json_input:
-    ordered_species_json = json.load(json_input)
-
-
-
-def test_get_request(request):
+    
+def get_user_metrics(request):
     if request.method == 'GET':
-        return JsonResponse({'message': 'GET request received!'}, status=200)
+        username = request.GET.get('username')
+        if username:
+            try:
+                user = User.objects.get(username=username)
+                user_metrics = UserMetrics.objects.get(user=user)
+                data = {
+                    'accuracy': user_metrics.accuracy,
+                    'variety': user_metrics.variety,
+                    'explorer': user_metrics.explorer,
+                    'achiever': user_metrics.achiever,
+                    'consistency': user_metrics.consistency,
+                }
+                return JsonResponse({'success': True, 'user_metrics': data})
+            except User.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+        else:
+            return JsonResponse({'error': 'Username not provided'}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
-@csrf_exempt
-def predict_image(request):
-    print("predicting image")
-    # print("Full request data body:", request.body)
-    if request.method == 'POST':
-        print("in post")
-        image_file = request.FILES.get('file')
-        print(request.FILES)
-
-
-        if not image_file:
-            print("no image!")
-            return JsonResponse({'error': 'No image provided'})
-        
-        try:
-            print("preprocessing")
-            input_img = preprocess_img(image_file)
-            with torch.no_grad():
-                output = model(input_img)
-                probabilities = torch_functional.softmax(output, dim=1)
-                confidence, predicted_class = probabilities.max(1)
-
-                if confidence.item() > 0.1:
-                    print("inside confidence")
-                    predicted_class_string = str(predicted_class.item())
-                    if predicted_class_string in ordered_species_json:
-                        classification = ordered_species_json[predicted_class_string]['plant_name']
-                        common_name = ordered_species_json[predicted_class_string]['common_name']
-                        conservation_status = ordered_species_json[predicted_class_string]['conservation_status']
-                        print("Successful")
-                        return JsonResponse({'scientific_name': classification, 'common_name': common_name, 'conservation_status': conservation_status, 'confidence': confidence.item()})
-                    else:
-                        print("")
-                        return JsonResponse({'error': 'Predicted class not in JSON'})
-                else:
-                    return JsonResponse({'error': 'Confidence too low'})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500) #TODO: check,and change to suitable code
- 
-    return JsonResponse({'error': 'Invalid request method'}, status=400)  #TODO: check if 400 is correct one for this
 
 
 
 
 
 
-
-# Other methods
+#==============================================
+# Other Methods Used in Views #################
+#==============================================
 def preprocess_img(image):
     input_image = Image.open(image).convert('RGB')
     preprocess = transforms.Compose([
@@ -535,6 +654,73 @@ def preprocess_img(image):
     input_batch = input_tensor.unsqueeze(0)
     return input_batch
 
+
+
+# User metrics for the spider graph
+def update_user_metrics(user):
+    print("Updating user Metrics for user",user.username)
+    metrics, created = UserMetrics.objects.get_or_create(user=user)
+
+    # Accuracy
+    total_confidence = user.plants.aggregate(total=Sum('confidence'))['total'] or 0
+    total_plants = user.plants.count()
+    metrics.accuracy = total_confidence / total_plants if total_plants else 0
+    
+    # Variety
+    rarities = user.plants.values_list('rarity', flat=True).distinct()
+    metrics.variety = len(rarities) / 6  # 6 Rarities including Not Listed + others
+
+    # Explorer: updating user's 
+    update_explorer_metric(user, metrics)
+
+    # Achiever: count the achievemetns which is set to True
+    achievements = Achievement.objects.get(user=user)
+    total_achievements = 8 
+    unlocked_achievements = 0
+    
+    # Iterate through each field in the Achievement model
+    for field in achievements._meta.get_fields():
+        if isinstance(field, BooleanField): 
+            if getattr(achievements, field.name):  # if field is True, increment the count
+                unlocked_achievements += 1
+    metrics.achiever = unlocked_achievements / total_achievements
+    
+    # Update consistency
+    metrics.consistency = min(user.current_streak / 20, 1)  # Assuming max streak is 20 days
+
+    metrics.save()
+
+# Exploerer metrics: calculating based on maximum lat long value upto 5km
+# Can be changed later with a better logic.
+def update_explorer_metric(user, metrics):
+    plants = user.plants.all()
+    latitudes = []
+    longitudes = []
+    
+    for plant in plants:
+        gps_coordinates = plant.gps_coordinates.split(',')
+        latitudes.append(float(gps_coordinates[0]))
+        longitudes.append(float(gps_coordinates[1]))
+    
+    if not latitudes or not longitudes:
+        metrics.explorer = 0
+        return
+    
+    # Assuming 1 degree of latitude or longitude is approximately equal to 111 km
+    # 0.045 degrees will be approximately 5 km
+    # ref: https://education.nationalgeographic.org/resource/longitude/
+    max_lat_spread = 0.045
+    max_lon_spread = 0.045
+    
+    lat_range = max(latitudes) - min(latitudes)
+    lon_range = max(longitudes) - min(longitudes)
+    
+    # get a score between 0 and 1
+    lat_score = min(lat_range / max_lat_spread, 1)
+    lon_score = min(lon_range / max_lon_spread, 1)
+    
+    # Use the average of latitude and longitude scores as the explorer score
+    metrics.explorer = (lat_score + lon_score) / 2
 
 def update_achievements(user):
     achievements, created = Achievement.objects.get_or_create(user=user)
@@ -584,4 +770,3 @@ def update_achievements(user):
 
 
     return achievement_messages
-
