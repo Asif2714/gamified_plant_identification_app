@@ -50,6 +50,8 @@ https://dev.to/simbamkenya/building-spider-chart-with-d3-js-and-react-js-50pj ->
 https://github.com/wuxudong/react-native-charts-wrapper?tab=readme-ov-file -> THe charts I used for the user metrics
 https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing -> Full testing instructions for django
 https://stackoverflow.com/questions/5875111/running-a-specific-test-case-in-django-when-your-app-has-a-tests-directory -> running a single test: manage.py test -k test_name
+https://sentry.io/answers/how-do-i-make-the-first-letter-of-a-string-uppercase-in-javascript/ -> 
+https://stackoverflow.com/questions/7342957/how-do-you-round-to-one-decimal-place-in-javascript -> rounding 
 
 Tutorials:
 https://www.youtube.com/watch?v=4fT2kmTWGwE&list=PLgjw1dR712joAlRdIc6BMNhX6_hrsL7kE&index=3 -> React native Bottom Tabs
