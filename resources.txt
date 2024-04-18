@@ -67,4 +67,11 @@ https://github.com/encode/django-rest-framework/issues/6808 -> RestFramework Cra
 Others
 https://github.com/ropensci/rredlist/issues/52 -> IUCN red list bypass
 public token (for non-commercial username): 9bb4facb6d23f48efbf424bb05c0c1ef1cf6f468393bc745d42179ac4aca5fee
+
+
+PyTorch resources:
+https://pytorch.org/vision/stable/transforms.html -> Transforms to change data
+https://stackoverflow.com/questions/62035811/in-pytorch-how-to-convert-the-cuda-related-codes-into-cpu-version -> Converting to CUDA
+https://discuss.pytorch.org/t/saving-and-loading-a-model-in-pytorch/2610 -> Saving and loading models in pytorch
 https://stackoverflow.com/questions/59628605/get-csrf-token-in-react-native -> CSRF Token not required for mobile only apps
+https://www.youtube.com/watch?v=xP9l9MptIZo -> hyperparamter tuning
