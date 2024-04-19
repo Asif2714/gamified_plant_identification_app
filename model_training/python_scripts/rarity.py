@@ -2,7 +2,7 @@ import requests
 import json
 
 # File path for adding rarity/conservation status to plants
-file_path = './model_training/python_scripts/source_jsons/ordered_id_species.json'
+file_path = './model_training/python_scripts/source_jsons/ordered_id_species_wo_rarity.json'
 with open(file_path, 'r') as file:
     plants_json = json.load(file)
 

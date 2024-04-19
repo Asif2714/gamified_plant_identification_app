@@ -1,4 +1,10 @@
+<!-- 
+Developer Note:
+This is from the Pl@ntNet-300K Zenodo repository which is available
+at : https://zenodo.org/records/5645731
 
+The dataset is used for the Plant Explorer machine learning model training
+ -->
 Images are stored in the three folders images/test, images/train and images/val. 
 
 All images belonging to the same class (i.e. species) are grouped in the same subfolder with the subfolder name being the species identifier. The correspondance between species identifiers and species scientific names is provided in the file "plantnet300K_species_id_2_name.json". The first part of a species name corresponds to the genus, e.g. the genus of the species "Lactuca virosa L." is "Lactuca". 
