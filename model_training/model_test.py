@@ -1,31 +1,34 @@
-import time;
+# This file is for testing the model to ensure it works
+# afterwards it's transferred to views.py
 
-# get the start time before imports
+import time;
 startTimeBeforeImport = time.time()
 
 import torch
 from torchvision import transforms
 from PIL import Image
 import torchvision.models as models
-from utils import load_model
 from PIL import Image
 import json
 import torch.nn.functional as F
+import os
 
 startTimeAfterImport = time.time()
 
-# model = models.resnet18(pretrained=True)
-# model_weights = torch.load('./results/xp1/xp1_weights_best_acc.tar') 
-# model.load_state_dict(model_weights)
-# model.eval()  # Set the model to evaluation mode
 
-filename = './results/xp1/xp1_weights_best_acc.tar' # pre-trained model path
-# filename = './results/xp1/resnet18_weights_best_acc.tar' - The one from plantnet directly
+filename = './saved_models/final_model_weights.tar' # pre-trained model 
 use_gpu = True  # load weights on the gpu
 model = models.resnet18(num_classes=1081) # 1081 classes in Pl@ntNet-300K
 
+# Code below for loading model state taken from utils.py in https://github.com/plantnet/PlantNet-300K
 # loading up model weights 
-load_model(model, filename=filename, use_gpu=use_gpu)
+if not os.path.exists(filename):
+    raise FileNotFoundError
+
+device = 'cuda:0' if use_gpu else 'cpu'
+d = torch.load(filename, map_location=device)
+model.load_state_dict(d['model_state_dict'])
+
 model.eval()
 
 

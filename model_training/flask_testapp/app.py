@@ -1,3 +1,7 @@
+# This is the initial file for testing if the model can be run on a deployed app
+# later experiemetned with Heroku platform, but ended up implemeneting in 
+# django locally
+
 from flask import Flask, render_template, request
 import torch
 import torchvision.transforms as transforms
@@ -5,19 +9,28 @@ from PIL import Image
 import torchvision.models as models
 import json
 import torch.nn.functional as F
-from utils import load_model 
+import os
 
 app = Flask(__name__)
 
 # load the pre-trained model
-filename = 'xp1_weights_best_acc.tar'
+filename = '../saved_models/final_model_weights.tar'
 use_gpu = False
-model = models.resnet18(num_classes=1081) 
-load_model(model, filename=filename, use_gpu=use_gpu)
+model = models.resnet18(num_classes=1081)
+
+# Code below for loading model state taken from utils.py in https://github.com/plantnet/PlantNet-300K
+# loading up model weights 
+if not os.path.exists(filename):
+    raise FileNotFoundError
+
+device = 'cuda:0' if use_gpu else 'cpu'
+d = torch.load(filename, map_location=device)
+model.load_state_dict(d['model_state_dict'])
+
 model.eval()
 
 # loading the names of the species
-class_names_file = './ordered_id_species.json'
+class_names_file = './ordered_id_species_old.json'
 with open(class_names_file, 'r') as json_input:
     ordered_species_json = json.load(json_input)
 
@@ -53,7 +66,7 @@ def predict():
     class_probabilities, predicted_class_str = probabilities.max(1)
     predicted_class_string = predicted_class_str.item()
 
-    if class_probabilities.item() > 0.6:
+    if class_probabilities.item() > 0.2:
         if str(predicted_class_str.item()) in ordered_species_json:
             classification = ordered_species_json[str(predicted_class_str.item())]['plant_name']
             confidence = class_probabilities.item()

@@ -279,14 +279,15 @@ def upload_image(request):
 
 
 # Loading resources and models
-model_path = os.path.join(os.path.dirname(__file__), 'xp1_weights_best_acc.tar')
+model_path = os.path.join(os.path.dirname(__file__), 'final_model_weights.tar')
 
 loaded_model = torch.load(model_path, map_location=torch.device('cpu'))
+print("keys for the model are:",loaded_model.keys())
 
 model = models.resnet18(weights=None)
 num_ftrs = model.fc.in_features
 model.fc = torch.nn.Linear(num_ftrs, 1081)
-model.load_state_dict(loaded_model['model'])
+model.load_state_dict(loaded_model['model_state_dict'])
 model.eval()
 
 class_names_file = './identify_app/ordered_id_species.json'
