@@ -1,8 +1,6 @@
 
 Developer Note:
-This file and the dataset in ./images is from the Pl@ntNet-300K Zenodo repository which is available
-at : https://zenodo.org/records/5645731
-
+This file and the dataset in ./images is from the Pl@ntNet-300K Zenodo repository which is available bat : https://zenodo.org/records/5645731
 The dataset is used for the Plant Explorer machine learning model training
 
 
