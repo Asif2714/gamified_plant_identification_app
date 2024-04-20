@@ -6,7 +6,7 @@ import { View, Text, StyleSheet } from "react-native";
 // But there are issues with implememnting it directly in react native
 // Resources used: 
 
-const BarChart = ({ metrics }) => {
+const UserMetricsBarChart = ({ metrics }) => {
     // Loading the key-value pairs
     const keys = Object.keys(metrics);
     const values = Object.values(metrics);
@@ -43,7 +43,7 @@ const BarChart = ({ metrics }) => {
       color: "black"
     },
     barBackground: {
-      height:22,
+      height:16,
       width: '100%',
       backgroundColor: "lightgray",
       borderRadius: 8
@@ -54,4 +54,4 @@ const BarChart = ({ metrics }) => {
     }
   });
   
-  export default BarChart;
+  export default UserMetricsBarChart;

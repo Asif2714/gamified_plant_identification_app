@@ -17,7 +17,7 @@ import RarityInfoModal from "../modals/RarityInfoModal";
 
 
 import CONFIG from '../app_config';
-import BarChart from "../components/BarChart";
+import UserMetricsBarChart from "../components/UserMetricsBarChart";
 // Colours available at https://www.withoutnations.com/portfolio/iucn-red-list/
 const iucnColours = {
   CR: "#EA5448",
@@ -184,7 +184,7 @@ export default function ChallengesScreen() {
       </View>
 
       {/* Achievements */}
-      <Text style={styles.headerTextAchievements}>Your Achievements</Text>
+      <Text style={styles.headerText}>Your Achievements</Text>
       <View style={styles.achievementsContainer}>
         {achievements &&
           Object.entries(achievements).map(([key, value]) => (
@@ -204,8 +204,9 @@ export default function ChallengesScreen() {
             </View>
           ))}
       </View>
-
-      <BarChart metrics={userMetrics} />
+                {/* User metrics section */}
+                <Text style={styles.headerText}>Your Achievements</Text>  
+      <UserMetricsBarChart metrics={userMetrics} />
     </View>
   );
 }
@@ -260,7 +261,7 @@ const styles = StyleSheet.create({
   },
 
   // Styles for achievements
-  headerTextAchievements: {
+  headerText: {
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",

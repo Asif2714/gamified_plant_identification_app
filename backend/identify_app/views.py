@@ -186,6 +186,7 @@ def get_user_details(request):
 
                 profile_name = user.profile_name if user.profile_name else f"{user.first_name} {user.last_name}".strip()
                 current_streak = user.current_streak if hasattr(user, 'current_streak') else 0
+                plant_count = Plant.objects.filter(user=user).count()
 
                 user_data = {
                     'username': user.username,
@@ -194,6 +195,7 @@ def get_user_details(request):
                     'profile_picture': user.profile_picture.url if user.profile_picture else None,
                     'experience_points': getattr(user, 'experience_points', 0),
                     'current_streak': current_streak,
+                    'plant_count': plant_count
                 }
                 return JsonResponse(user_data)
             except User.DoesNotExist:
@@ -282,7 +284,7 @@ def upload_image(request):
 model_path = os.path.join(os.path.dirname(__file__), 'final_model_weights.tar')
 
 loaded_model = torch.load(model_path, map_location=torch.device('cpu'))
-print("keys for the model are:",loaded_model.keys())
+# print("keys for the model are:",loaded_model.keys())
 
 model = models.resnet18(weights=None)
 num_ftrs = model.fc.in_features

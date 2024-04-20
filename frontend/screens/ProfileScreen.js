@@ -366,8 +366,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     padding: 10,
     backgroundColor: "#F6FBF4",
-    borderRadius: 10,
-    elevation: 3,
+    // borderRadius: 10,
+    // elevation: 3,
   },
   infoText: {
     fontSize: 16,
@@ -386,6 +386,11 @@ const styles = StyleSheet.create({
   },
   leftSection: {
     justifyContent: "center",
+    borderRight: "solid",
+    borderRadius:5,
+    borderWidth:1,
+    borderColor:"lightgray",
+    padding:2,
   },
   rightSection: {
     alignItems: "center",

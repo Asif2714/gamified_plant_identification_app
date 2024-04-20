@@ -34,7 +34,7 @@ const RarityInfoModal = ({ visible, onClose }) => {
               Learn more on the IUCN Red List website
             </Text>
           </TouchableOpacity>
-  
+        
           <Button title="Close" onPress={onClose} />
         </View>
       </Modal>
