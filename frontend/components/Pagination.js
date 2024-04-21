@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 
+// Code followed from the tutorial : https://youtu.be/2TgArwz6je8 with own modifications
 export default function Pagination({data}) {
   return (
     <View style={styles.container}>

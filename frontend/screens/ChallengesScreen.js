@@ -1,22 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Button,
-  TouchableOpacity,
-  Alert,
-  Modal,
-  Linking,
-} from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
+import CONFIG from "../app_config";
 
 import RarityInfoModal from "../modals/RarityInfoModal";
-
-
-import CONFIG from '../app_config';
 import UserMetricsBarChart from "../components/UserMetricsBarChart";
 // Colours available at https://www.withoutnations.com/portfolio/iucn-red-list/
 const iucnColours = {
@@ -29,6 +18,7 @@ const iucnColours = {
 };
 
 export default function ChallengesScreen() {
+  // Rarity counts and user metrics for the current user
   const [rarityCounts, setRarityCounts] = useState({
     CR: 0,
     EN: 0,
@@ -37,7 +27,6 @@ export default function ChallengesScreen() {
     LC: 0,
     NL: 0,
   });
-
   const [userMetrics, setUserMetrics] = useState({
     Accuracy: 0,
     variety: 0,
@@ -47,7 +36,6 @@ export default function ChallengesScreen() {
   });
 
   const [infoModalVisible, setInfoModalVisible] = useState(false);
-
   const [achievements, setAchievements] = useState(null);
 
   const fetchRarityCounts = async () => {
@@ -59,13 +47,11 @@ export default function ChallengesScreen() {
         const response = await fetch(request, {
           method: "GET",
           headers: {
-            // Authorization: `Token ${token}`,
             "Content-Type": "application/json",
           },
         });
 
         const rarityData = await response.json();
-
         if (response.ok) {
           console.log("User plant details below:");
           console.log(rarityData);
@@ -102,26 +88,28 @@ export default function ChallengesScreen() {
   };
 
   const fetchUserMetrics = async () => {
-    const username = await AsyncStorage.getItem('username');
-  
+    const username = await AsyncStorage.getItem("username");
+
     try {
-        const response = await fetch(`${CONFIG.API_URL}/get-user-metrics/?username=${username}`, {
-        method: 'GET',
-        headers: {
-          // Authorization: `Token ${token}`, 
-          'Content-Type': 'application/json',
-        },
-      });
-  
+      const response = await fetch(
+        `${CONFIG.API_URL}/get-user-metrics/?username=${username}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       if (response.ok) {
         const data = await response.json();
-        console.log('User metrics:', data.user_metrics);
+        console.log("User metrics:", data.user_metrics);
         setUserMetrics(data.user_metrics);
       } else {
-        console.error('Failed to fetch user metrics:');
+        console.error("Failed to fetch user metrics:");
       }
     } catch (error) {
-      console.error('Error fetching user metrics:', error);
+      console.error("Error fetching user metrics:", error);
     }
   };
 
@@ -204,8 +192,8 @@ export default function ChallengesScreen() {
             </View>
           ))}
       </View>
-                {/* User metrics section */}
-                <Text style={styles.headerText}>Your Achievements</Text>  
+      {/* User metrics section */}
+      <Text style={styles.headerText}>Your Achievements</Text>
       <UserMetricsBarChart metrics={userMetrics} />
     </View>
   );
@@ -257,7 +245,7 @@ const styles = StyleSheet.create({
     padding: 3,
     marginTop: 5,
     alignItems: "center",
-    backgroundColor: "#ffffff",
+    backgroundColor: "white",
   },
 
   // Styles for achievements
@@ -265,7 +253,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
-    margin: 10,
+    margin: 5,
   },
   achievementsContainer: {
     flexDirection: "row",
@@ -274,7 +262,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   achievementItem: {
-    width: "45%",  
+    width: "45%",
     padding: 10,
     margin: 5,
     alignItems: "center",
@@ -282,6 +270,6 @@ const styles = StyleSheet.create({
   },
   achievementText: {
     textAlign: "center",
-    color: "#fff",
+    color: "white",
   },
 });

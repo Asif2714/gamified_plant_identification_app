@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Button,
   Image,
-  FlatList,
   TouchableOpacity,
   Alert,
 } from "react-native";
@@ -17,10 +16,9 @@ import { Modal } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
 // Importing components
-// import ProfilePlantCarousel from "../components/ProfilePlantCarousel";
 import Slider from "../components/Slider";
 import CONFIG from "../app_config";
-import FeedbackModal from '../modals/FeedbackModal';
+import FeedbackModal from "../modals/FeedbackModal";
 
 export default function ProfileScreen(props) {
   const { user, setUser, setUserToken, setUserId } = useContext(UserContext);
@@ -112,10 +110,6 @@ export default function ProfileScreen(props) {
     await AsyncStorage.removeItem("userId");
 
     props.onSignOut();
-  };
-
-  const handleFeedbackPress = () => {
-    Alert.alert("To be implemented soon!");
   };
 
   const fetchUserPlants = async () => {
@@ -285,7 +279,7 @@ export default function ProfileScreen(props) {
           <Text style={styles.buttonText}>See Map</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={showFeedbackModal}>
-            <Text style={styles.buttonText}>Feedback</Text>
+          <Text style={styles.buttonText}>Feedback</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleSignOut}>
           <Text style={styles.buttonText}>Log Out</Text>
@@ -330,10 +324,10 @@ export default function ProfileScreen(props) {
 
         {/* Feedback modal */}
         <FeedbackModal
-        isVisible={feedbackModalVisible}
-        onClose={closeFeedbackModal}
-        onSubmitFeedback={handleFeedbackSubmission}
-      />
+          isVisible={feedbackModalVisible}
+          onClose={closeFeedbackModal}
+          onSubmitFeedback={handleFeedbackSubmission}
+        />
       </View>
     </View>
   );
@@ -344,7 +338,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "white",
   },
   text: {
     fontSize: 16,
@@ -358,11 +352,11 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     elevation: 3,
     color: "#252900",
-    flexDirection: 'column'
+    flexDirection: "column",
   },
   infoBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 5,
     padding: 10,
     backgroundColor: "#F6FBF4",
@@ -372,7 +366,7 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 16,
     marginLeft: 10,
-    color: "#252900", 
+    color: "#252900",
   },
   icon: {
     marginRight: 10,
@@ -387,10 +381,10 @@ const styles = StyleSheet.create({
   leftSection: {
     justifyContent: "center",
     borderRight: "solid",
-    borderRadius:5,
-    borderWidth:1,
-    borderColor:"lightgray",
-    padding:2,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "lightgray",
+    padding: 2,
   },
   rightSection: {
     alignItems: "center",
@@ -399,7 +393,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 7,
-    backgroundColor: "#ccc",
+    // backgroundColor: "gray",
   },
   username: {
     marginTop: 10,
@@ -456,7 +450,7 @@ const styles = StyleSheet.create({
     borderColor: "white",
   },
 });
-
+// COLOR SCHEME!
 // #195100 main
 
 // #252900 sec

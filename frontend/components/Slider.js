@@ -4,6 +4,8 @@ import React from "react";
 import SlideItem from "./SlideItem";
 import Pagination from "./Pagination";
 
+// Code followed from the tutorial : https://youtu.be/2TgArwz6je8 with own modifications
+
 const Slider = (props) => {
   console.log("inside slider");
   // console.log(props.userPlantDetails)

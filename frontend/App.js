@@ -21,9 +21,8 @@ const App = () => {
     //TODO: logic to check if user is already signed in and setting userToeken accordingly
   }, []);
 
-
   const handleSignOut = () => {
-    setUserToken(null); 
+    setUserToken(null);
   };
 
   return (
@@ -33,7 +32,7 @@ const App = () => {
           {/* {userToken ? <MainAppScreen /> : <AuthScreens />} */}
 
           {userToken ? (
-            <MainAppScreen onSignOut={handleSignOut}/>
+            <MainAppScreen onSignOut={handleSignOut} />
           ) : (
             <AuthTab.Navigator
               screenOptions={({ route }) => ({

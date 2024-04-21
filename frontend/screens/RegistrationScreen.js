@@ -25,8 +25,8 @@ const RegistrationScreen = ({ onRegistrationComplete }) => {
   const [errors, setErrors] = useState({});
 
   const validate = () => {
-
-    let emailRegex = /^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/;
+    // regex from https://stackoverflow.com/questions/4964691/super-simple-email-validation-with-javascript
+    let emailRegex = /^\S+@\S+\.\S+$/;
 
     let isValid = true;
     let errors = {};
@@ -35,19 +35,15 @@ const RegistrationScreen = ({ onRegistrationComplete }) => {
       errors.email = "Email missing";
       isValid = false;
     } else if (!emailRegex.test(email)) {
-        errors.email = "invalid email";
-        isValid = false;
-        Alert.alert(
-            "Invalid email",
-            "Enter a valid email address",
-            [
-              {
-                text: "OK",
-                onPress: () => console.log("OK Pressed")
-              }
-            ]
-          );
-      }
+      errors.email = "invalid email";
+      isValid = false;
+      Alert.alert("Invalid email", "Enter a valid email address", [
+        {
+          text: "OK",
+          onPress: () => console.log("OK Pressed"),
+        },
+      ]);
+    }
 
     if (!username) {
       errors.username = "Username missing";
@@ -219,7 +215,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 9,
     padding: 15,
-    backgroundColor: "#ffffff",
+    backgroundColor: "white",
     borderColor: "#195100",
     borderWidth: 1,
     marginBottom: 5,
@@ -236,15 +232,17 @@ const styles = StyleSheet.create({
   registerButton: {
     height: 50,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "#195100",
     marginTop: 20,
+    width: 200,
+    alignSelf: "center",
   },
   registerButtonText: {
-    color: "#ffffff",
+    color: "white",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

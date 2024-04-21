@@ -3,7 +3,7 @@ import React from "react";
 import moment from "moment"; // for date conversion
 import CONFIG from '../app_config';
 
-
+// Code followed from the tutorial : https://youtu.be/2TgArwz6je8 with own modifications
 const{width, height} = Dimensions.get('screen');
 
 export default function SlideItem({ item }) {

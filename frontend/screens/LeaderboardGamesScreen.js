@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity,Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import CONFIG from "../app_config";
@@ -44,22 +52,22 @@ export default function LeaderboardGamesScreen() {
       const requestUrl = `${CONFIG.API_URL}/user-details/?username=${username}`;
       const response = await fetch(requestUrl);
       const data = await response.json();
-      
+
       // Showing information of the selected user
       if (response.ok) {
         setHighLightedUser(data);
         setUserInfoVisible(true);
-        console.log(data)
+        console.log(data);
         profilename = "";
-        if(data.profile_name === ""){
-            profilename = "Not set"
+        if (data.profile_name === "") {
+          profilename = "Not set";
         } else {
-            profilename = data.profile_name
+          profilename = data.profile_name;
         }
-        userInfoFormatted = `Profile Name: ${profilename}\nExperience Points: ${data.experience_points}\nDay Streak: ${data.current_streak}\nPlants identified: ${data.plant_count}`
-        Alert.alert(`User details of ${data.username}`,userInfoFormatted)
+        userInfoFormatted = `Profile Name: ${profilename}\nExperience Points: ${data.experience_points}\nDay Streak: ${data.current_streak}\nPlants identified: ${data.plant_count}`;
+        Alert.alert(`User details of ${data.username}`, userInfoFormatted);
       } else {
-        console.error('Failed to fetch user details', data.error);
+        console.error("Failed to fetch user details", data.error);
       }
     } catch (error) {
       console.error("Error fetching user details:", error);
@@ -116,25 +124,16 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#F6FBF4",
   },
-  heading: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  position: {
-    fontSize: 18,
-    marginBottom: 10,
-  },
   positionContainer: {
     backgroundColor: "#195100",
-    borderRadius: 8,
+    borderRadius: 10,
     padding: 6,
     alignItems: "center",
     marginBottom: 4,
   },
   position: {
     fontSize: 18,
-    color: "#ffffff",
+    color: "white",
     fontWeight: "bold",
   },
   item: {
@@ -143,17 +142,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 5,
-    paddingHorizontal:4,
+    paddingHorizontal: 4,
     // borderBottomWidth: 1,
     borderBottomColor: "#ccc",
-    borderRadius:6,
-    borderWidth:2,
-    marginVertical:2
+    borderRadius: 6,
+    borderWidth: 2,
+    marginVertical: 2,
   },
-  hintText:{
-    fontSize:14,
+  hintText: {
+    fontSize: 14,
     fontWeight: "700",
-    textAlign:"center"
+    textAlign: "center",
   },
   profilePic: {
     width: 30,
@@ -165,6 +164,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginRight: 6,
     color: "#252900",
+    fontWeight: "700",
   },
   username: {
     flex: 1,

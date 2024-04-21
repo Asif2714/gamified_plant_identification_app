@@ -51,6 +51,7 @@ image_path = './test_images/Humulus lupulus L..jpg'
 
 # preprocesssing the testing image
 # matching 
+# the transformations matches the ImageNet Transformations
 preprocess = transforms.Compose([
     transforms.Resize((224, 224)), # default inputsize for ResNet
     transforms.ToTensor(),

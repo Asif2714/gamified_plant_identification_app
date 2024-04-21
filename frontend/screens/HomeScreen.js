@@ -77,43 +77,33 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-    mainView: {
-        backgroundColor: "#F6FBF4"
-    },
-  container: {
-    flex: 1,
-    marginTop: 20,
+  mainView: {
     backgroundColor: "#F6FBF4",
   },
   header: {
     fontSize: 12,
-    fontWeight: 'bold',
-    alignSelf: 'center',
+    fontWeight: "bold",
+    alignSelf: "center",
     marginVertical: 0,
   },
   card: {
     margin: 10,
-    borderRadius: 6,
-    backgroundColor: "#fff",
-    shadowColor: "#000",
+    borderRadius: 8,
+    shadowColor: "green",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 4,
   },
   image: {
     width: "100%",
     height: 200,
-    borderTopLeftRadius: 6,
-    borderTopRightRadius: 6,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
   },
   infoContainer: {
-    padding: 10,
-    backgroundColor: "#F6FBE4"
-  },
-  text: {
-    fontSize: 16,
-    marginBottom: 5,
+    padding: 5,
+    backgroundColor: "#F6FBE4",
   },
   userContainer: {
     flexDirection: "row",
@@ -127,18 +117,18 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   username: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 12,
     color: "#252900",
   },
   commonName: {
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: "black",
     marginBottom: 4,
   },
   scientificName: {
-    fontStyle: 'italic',
+    fontStyle: "italic",
     fontSize: 13,
     color: "#252900",
   },
