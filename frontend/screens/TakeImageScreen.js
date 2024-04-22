@@ -67,6 +67,14 @@ export default function TakeImageScreen() {
   };
 
   const takeImageWithCamera = async () => {
+
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (status !== 'granted') {
+        Alert.alert('Permission required', 'Camera permission is required to take pictures in the app');
+        return;
+    }
+
     let result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [4, 3],

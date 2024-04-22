@@ -21,7 +21,7 @@ class PredictImageTest(TestCase):
 
         # checking the response
         response_json = response.json()
-        print(response_json)
+        # print(response_json)
         
         self.assertIn('Trifolium', response_json['scientific_name'])
 
@@ -36,9 +36,26 @@ class PredictImageTest(TestCase):
 
         # checking the response
         response_json = response.json()
-        print(response_json)
+        # print(response_json)
         
         self.assertIn('Confidence too low', response_json['error'])
+
+    def test_predict_image_invalid_filetype(self):
+        # testing with a wrong file format
+        # File downloaded from: https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf
+        image_path = Path('test_images/dummy.pdf')
+        with image_path.open('rb') as image_file:
+            image = SimpleUploadedFile(image_path.name, image_file.read(), content_type="application/pdf")
+        
+        response = self.client.post(reverse("predict_image"), {'file': image}, format='multipart')
+        self.assertNotEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 500)
+
+        # checking the response
+        response_json = response.json()
+        print(response_json)
+        
+        self.assertIn('cannot identify image file', response_json['error'])
 
     
     def test_predict_image_no_image(self):
@@ -52,5 +69,5 @@ class PredictImageTest(TestCase):
         # Although not fully relevant, testing this endpoint here
         # This checks if backend is running withhout having a complicated processing
         response_json = self.client.get(reverse('get_request')).json()
-        print(response_json)
+        # print(response_json)
         self.assertIn("Backend server is running!", response_json['Reply:'])

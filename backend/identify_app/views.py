@@ -2,6 +2,8 @@
 
 import json
 import os
+import sqlite3
+from django.db import IntegrityError
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.files.base import ContentFile
@@ -53,15 +55,14 @@ generator = pydenticon.Generator(5, 5, digest=hashlib.sha1,
                                  foreground=foreground, background=background)
 
 #==============================================
-# View functions for profile system and updates
+# View functions for profile system and updates - Tests in test_profile_system.py (done)
 #==============================================
-@csrf_exempt
+@csrf_exempt  # TODO: exempt for simplicity, disabling CSRF. For production, we need to include tokens
 def register(request):
     """Handles the user registration
 
     Args:
         request (HttpRequest): The HTTP request.
-
 
     Returns:
         JsonResponse: The  response from server indicating status of registering
@@ -73,30 +74,33 @@ def register(request):
         except json.JSONDecodeError as e:
             return JsonResponse({'error': str(e)}, status=400)
         
-        email: str = data.get('email')
-        username: str = data.get('username')
-        password: str = data.get('password')
-        first_name = data.get('first_name')
-        last_name = data.get('last_name')
+        try:
+            email: str = data.get('email')
+            username: str = data.get('username')
+            password: str = data.get('password')
+            first_name = data.get('first_name')
+            last_name = data.get('last_name')
 
-        if User.objects.filter(username=username).exists():
-            print("User already exists!")
-            return JsonResponse({'error': 'User already exists'}, status=400)
+            if User.objects.filter(username=username).exists():
+                print("User already exists!")
+                return JsonResponse({'error': 'User already exists'}, status=400)
 
-        # if User.objects.filter(email=email).exists(): # can add this check if required
-        hashed_password = make_password(password)
-        user = User.objects.create(username=username, email=email, password=hashed_password, 
-                                   first_name=first_name,last_name=last_name)
-        
-        Achievement.objects.create(user=user)
-        UserMetrics.objects.create(user=user)
+            # if User.objects.filter(email=email).exists(): # can add this check if required
+            hashed_password = make_password(password)
+            user = User.objects.create(username=username, email=email, password=hashed_password, 
+                                    first_name=first_name,last_name=last_name)
+            
+            Achievement.objects.create(user=user)
+            UserMetrics.objects.create(user=user)
 
-        identicon = generator.generate(username, 200, 200,
-                               padding=padding, inverted=True, output_format="png")
-        identicon_file = ContentFile(identicon, name=f"{user.username}_identicon.png")
+            identicon = generator.generate(username, 200, 200,
+                                padding=padding, inverted=True, output_format="png")
+            identicon_file = ContentFile(identicon, name=f"{user.username}_identicon.png")
 
-        user.profile_picture.save(identicon_file.name, identicon_file, save=True)
-        return JsonResponse({'success': 'User created'}, status=201)
+            user.profile_picture.save(identicon_file.name, identicon_file, save=True)
+            return JsonResponse({'success': 'User created'}, status=201)
+        except IntegrityError as e:
+            return JsonResponse({"error":"Integrity error, make sure all fields are present"}, status=400)
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
@@ -211,7 +215,7 @@ def get_user_details(request):
 
 
 #============================
-# View functions for Feedback
+# View functions for Feedback - Tests in test_feedback.py (done)
 #============================
 
 @csrf_exempt
@@ -242,7 +246,7 @@ def submit_feedback(request):
 
 
 #==============================================
-# View functions for Plant species Predictions
+# View functions for Plant species Predictions - tests in test_predictions.py (done)
 #==============================================
 
 
@@ -352,7 +356,7 @@ def predict_image(request):
 
 
 #==========================================
-# View functions for relevant plant details
+# View functions for relevant plant details - Tests in test_plant_details.py (done)
 #==========================================
 
 
@@ -391,6 +395,8 @@ def save_plant_details(request):
             confidence = float(request.POST.get('confidence', 50)) # if confidence missing by any change, we do the midpoint 
             image_file = request.FILES.get('file')
 
+            # TODO: probable error here, check and update file outputs
+            # issues with scientific name ending with a .
             filename = f"{user}_{scientific_name}.{image_file.name.split('.')[-1]}"
 
             # Create and save the Plant instance
@@ -459,7 +465,7 @@ def save_plant_details(request):
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
 # TODO: Combine these, and use only one endiping
-    
+    # the endpoint below is unused, could be removed later
 @csrf_exempt
 def get_user_plants(request, username):
     
@@ -472,19 +478,24 @@ def get_user_plants(request, username):
     except User.DoesNotExist:
         return JsonResponse({'error': 'User not found!'}, status=404)
     
+    # Need to keep this one
 @csrf_exempt
 def get_user_plant_with_details(request, username):
     if request.method == 'GET':
-        user = User.objects.get(username=username)
-        plants = Plant.objects.filter(user=user).order_by('-date_time_taken')
-        serialized_plants_data = serialize("json", plants)
-        return JsonResponse({'plants_data': serialized_plants_data})
+        try:
+            user = User.objects.get(username=username)
+            plants = Plant.objects.filter(user=user).order_by('-date_time_taken')
+            serialized_plants_data = serialize("json", plants)
+            return JsonResponse({'plants_data': serialized_plants_data})
+    
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found!'}, status=404)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
 #======================================
-# View functions for leaderbaord system
+# View functions for leaderbaord system - Tests in test_leaderboard.py (done)
 #======================================
 def get_leaderboard(request):
     if request.method == 'GET':
@@ -510,7 +521,7 @@ def get_leaderboard(request):
 
 
 #==============================================
-# View functions for Homepages and Feed
+# View functions for Homepages and Feed - tests in test_homepage_feed.py - (done)
 #==============================================
     
 def get_plants_for_homepage(request):
@@ -555,7 +566,7 @@ Not Listed
 
 
 #==============================
-# Challenges Tab View endpoints
+# Challenges Tab View endpoints - Tests in test_challenges.py (done)
 #==============================
 
 @csrf_exempt

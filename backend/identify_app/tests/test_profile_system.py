@@ -43,6 +43,15 @@ class ProfileSystemTestCase(TestCase):
         response = self.client.post(reverse('register'), json.dumps(user_data), content_type='application/json')
         self.assertNotEqual(response.status_code, 201) 
 
+    def test_register_user_incomplete(self):
+        user_data = {
+            'email': 'testuser0@gmail.com', 
+            'password': 'testpass',
+            'first_name': 'Condition',
+            'last_name': 'Zero'
+        }
+        response = self.client.post(reverse('register'), json.dumps(user_data), content_type='application/json')
+        self.assertNotEqual(response.status_code, 201) 
 
 
     def test_login(self):
@@ -79,6 +88,4 @@ class ProfileSystemTestCase(TestCase):
         response = self.client.get(reverse('get_user_details'), {'username': 'somerandomuser'})
         self.assertNotEqual(response.status_code, 200) 
 
-
-    # def test_login_logout(self):
         
