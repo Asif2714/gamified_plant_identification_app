@@ -45,15 +45,18 @@ const SignInScreen = ({ onSignIn }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.appName}>Plant Explorer</Text>
+
+      <Text style={styles.label}>Username</Text>
       <TextInput
         style={styles.input}
-        placeholder="Username"
+        placeholder="Enter your username"
         value={username}
         onChangeText={setUsername}
       />
+      <Text style={styles.label}>Password</Text>
       <TextInput
         style={styles.input}
-        placeholder="Password"
+        placeholder="Enter your password"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
@@ -102,6 +105,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  label: {
+    fontSize: 14,
+    color: "#252900",
+    marginBottom: 5,
   },
 });
 

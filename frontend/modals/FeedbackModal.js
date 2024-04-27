@@ -56,19 +56,21 @@ function FeedbackModal({ isVisible, onClose, onSubmitFeedback }) {
     <Modal visible={isVisible} animationType="slide" transparent={true}>
       <View style={styles.modalContent}>
         <Text style={styles.modalText}>Feedback Form</Text>
+        <Text style={styles.label}>Subject</Text>
         <TextInput
-          placeholder="Subject"
+        //   placeholder=""
           value={subject}
           onChangeText={setSubject}
           style={styles.input}
         />
+        <Text style={styles.label}>Description</Text>
         <TextInput
-          placeholder="Description"
+        //   placeholder="Description"
           value={description}
           onChangeText={setDescription}
           style={styles.input}
           multiline={true}
-          numberOfLines={3}
+          numberOfLines={9}
         />
         <TouchableOpacity style={styles.closeButton} onPress={handleSubmit}>
           <Text style={styles.closeButtonText}>Submit</Text>
@@ -122,6 +124,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  label: {
+    fontSize: 14,
+    color: "#252900",
+    marginBottom: 5,
   },
 });
 

@@ -193,7 +193,7 @@ export default function ChallengesScreen() {
           ))}
       </View>
       {/* User metrics section */}
-      <Text style={styles.headerText}>Your Achievements</Text>
+      <Text style={styles.headerText}>Your User Metrics</Text>
       <UserMetricsBarChart metrics={userMetrics} />
     </View>
   );

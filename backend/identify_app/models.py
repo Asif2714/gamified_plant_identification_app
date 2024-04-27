@@ -6,7 +6,7 @@ from django.utils import timezone
 # Create your models here.
 class User(AbstractUser):
     '''
-    TODO DOCSTRING
+    User model with additional details 
     '''
     # We have first_name and last_name, but still using this for simplicity
     profile_name = models.CharField(max_length=255, blank=True, null=True) 
@@ -18,7 +18,7 @@ class User(AbstractUser):
 
 class Achievement(models.Model):
     '''
-    TODO: Docstring
+    The achievements a user can earn
     '''
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, 
@@ -38,6 +38,9 @@ class Achievement(models.Model):
 
 # Data to be used for spider graph
 class UserMetrics(models.Model):
+    '''
+    Differnent quantitative metrics of the user to measure engagement
+    '''
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='metrics')
     
     # The metrics:
@@ -51,7 +54,7 @@ class UserMetrics(models.Model):
 
 class Plant(models.Model):
     '''
-    TODO DOCSTRING
+    Details about plants identified and saved by a user
     '''
     user = models.ForeignKey(settings.AUTH_USER_MODEL, 
                              on_delete=models.CASCADE, 
@@ -69,6 +72,9 @@ class Plant(models.Model):
 
 
 class Feedback(models.Model):
+    '''
+    Feedback submitted by users
+    '''
     user = models.CharField(max_length=255)
     subject = models.CharField(max_length=255)
     description = models.TextField()
