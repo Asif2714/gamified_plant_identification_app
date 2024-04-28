@@ -17,7 +17,7 @@ software required to run the program. Specifically, the following:
 - If you want to have a separate envrionment, you can install the packages mentioned above in an Anaconda envroinment. To have a minimal way to do this, install miniconda, create your ennvironment and install the packages in it. Installation instructions: https://docs.anaconda.com/free/miniconda/index.html , instructions for creating environment: https://saturncloud.io/blog/how-to-create-a-conda-environment-with-a-specific-python-version/ . It is recommended to use python 3.11.5 as newer versions released might create issues, you can run the command: `conda create --name <yourEnvName> python=3.11.5 `
 
 Then download the code and set up the development envrionment as follows:
-- Clone this repository to your local system using: `git clone https://github.com/Asif2714/gamified_plant_identification_app.git`
+- Clone this repository to your local system using: `git clone https://github.com/Asif2714/gamified_plant_identification_app.git`. It might take some time as there are large files in this project
 - Open 2 terminals in the folder where you cloned the repository, one for frontend and one
 for backend.
     - On the first terminal change the directory to backend folder using `cd backend`, and do the following:
