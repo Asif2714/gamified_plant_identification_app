@@ -14,6 +14,7 @@ software required to run the program. Specifically, the following:
     - `npm install -g react-native-cli`
     - further installations done in next step
 - (If you want to run the app in a Virtual andriod machine) Install Andriod Studio, set up a device in Virutal Device Manager, and start it
+- If you want to have a separate envrionment, you can install the packages mentioned above in an Anaconda envroinment. To have a minimal way to do this, install miniconda, create your ennvironment and install the packages in it. Installation instructions: https://docs.anaconda.com/free/miniconda/index.html , instructions for creating environment: https://saturncloud.io/blog/how-to-create-a-conda-environment-with-a-specific-python-version/
 
 Then download the code and set up the development envrionment as follows:
 - Clone this repository to your local system using: `git clone https://github.com/Asif2714/gamified_plant_identification_app.git`
@@ -21,6 +22,12 @@ Then download the code and set up the development envrionment as follows:
 for backend.
     - On the first terminal change the directory to backend folder using `cd backend`, and do the following:
         - Install required packages used by backend, by running the command `pip install requirements.txt`
+        - Create and make the migrations for the database by running the following two commands
+        ```
+        python manage.py makemigrations
+        python manage.py migrate
+
+        ```
         - Run the backend server: 
             - if you want to run the app on Andriod Studio Emulator: using the command: `python manage.py runserver`
             - If you want to run the application on your mobile device, you need to do the following:  Open `frontend/app_config.js` and set `USE_LOCAL_IP = true` and put your ip address of your laptop device (run `ipconfig`in terminal to get IPv4 address) in `LOCAL_IP_ADDRESS`. Both your machine and the mobile device should be in the same Wifi network.Then run backend server using this command: `python manage.py runserver <your_ip_address>:8000`. Also in `backend/settings.py` add the IP address in `ALLOWED_HOSTS`

@@ -63,6 +63,12 @@ export default function HomeScreen() {
     }
   };
 
+  const noContentForHome = () => (
+    <View style={styles.noContent}>
+      <Text style={styles.noContentTxt}>No images in the database for any users, add one by identifying your first plant!</Text>
+    </View>
+  );
+
   return (
     <View style={styles.mainView}>
       <Text style={styles.header}>The home feed</Text>
@@ -70,6 +76,7 @@ export default function HomeScreen() {
         data={content}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
+        ListEmptyComponent={noContentForHome}
       />
       {/* TODO: add a refresh feed button */}
     </View>
@@ -142,4 +149,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "gray",
   },
+  noContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 35
+  },
+  noContentTxt: {
+    fontSize: 16,
+  }
 });
