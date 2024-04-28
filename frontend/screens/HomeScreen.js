@@ -155,6 +155,6 @@ const styles = StyleSheet.create({
     marginTop: 35
   },
   noContentTxt: {
-    fontSize: 16,
+    fontSize: 12
   }
 });

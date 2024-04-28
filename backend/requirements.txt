@@ -198,3 +198,9 @@ wrapt==1.14.1
 wsproto==1.2.0
 zope.event==5.0
 zope.interface==6.1
+django
+django-cors-headers
+torch==2.1.0+cu121
+torchaudio==2.1.0+cu121
+torchvision==0.16.0+cu121
+pydenticon==0.3.1

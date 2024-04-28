@@ -14,14 +14,14 @@ software required to run the program. Specifically, the following:
     - `npm install -g react-native-cli`
     - further installations done in next step
 - (If you want to run the app in a Virtual andriod machine) Install Andriod Studio, set up a device in Virutal Device Manager, and start it
-- If you want to have a separate envrionment, you can install the packages mentioned above in an Anaconda envroinment. To have a minimal way to do this, install miniconda, create your ennvironment and install the packages in it. Installation instructions: https://docs.anaconda.com/free/miniconda/index.html , instructions for creating environment: https://saturncloud.io/blog/how-to-create-a-conda-environment-with-a-specific-python-version/
+- If you want to have a separate envrionment, you can install the packages mentioned above in an Anaconda envroinment. To have a minimal way to do this, install miniconda, create your ennvironment and install the packages in it. Installation instructions: https://docs.anaconda.com/free/miniconda/index.html , instructions for creating environment: https://saturncloud.io/blog/how-to-create-a-conda-environment-with-a-specific-python-version/ . It is recommended to use python 3.11.5 as newer versions released might create issues, you can run the command: `conda create --name <yourEnvName> python=3.11.5 `
 
 Then download the code and set up the development envrionment as follows:
 - Clone this repository to your local system using: `git clone https://github.com/Asif2714/gamified_plant_identification_app.git`
 - Open 2 terminals in the folder where you cloned the repository, one for frontend and one
 for backend.
     - On the first terminal change the directory to backend folder using `cd backend`, and do the following:
-        - Install required packages used by backend, by running the command `pip install requirements.txt`
+        - Install required packages used by backend, by running the command `pip install -r requirements.txt`
         - Create and make the migrations for the database by running the following two commands
         ```
         python manage.py makemigrations
@@ -42,6 +42,7 @@ The Training code for the ResNet-18 based model is available in `./model_trainin
 
 The training dataset is not included in the repository, which you have to download and copy manually. To do it, download the dataset from https://zenodo.org/records/5645731, extract the zipped download, and copy the folder `images` to `./model_training` folder. Afterwards, the training script should have everything required to run the script.
 
+Please note that drivers for CUDA Drivers have to be installed if applicable.
 
 ## Key information about the application:
 Overview: A mobile application to take pictures of plants in a gamified way, where you have game-like elements like scoring, leaderboard, challenges and streaks. 
